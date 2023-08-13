@@ -1,3 +1,3 @@
 # Portfolio
 
-Hi, this is my [Portfolio](https://amedoeyes.vercel.app).
+Hi, this is my [portfolio](https://amedoeyes.vercel.app).

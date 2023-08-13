@@ -12,7 +12,7 @@ export default function Home() {
 			<main>
 				<Hero />
 				<div className="bg-secondary relative w-full">
-					<div className="m-auto flex max-w-6xl flex-col px-8">
+					<div className="m-auto flex max-w-6xl flex-col gap-20 px-8 py-20">
 						<Projects />
 						<About />
 						<Contact />
