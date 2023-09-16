@@ -13,7 +13,7 @@ export default function Home() {
 			<main>
 				<Hero />
 				<div className="relative w-full bg-secondary">
-					<div className="flex max-w-6xl flex-col gap-10 p-10">
+					<div className="flex max-w-6xl flex-col m-auto gap-10 p-10">
 						<Projects />
 						<Separator />
 						<About />
