@@ -7,33 +7,33 @@ export default function Header() {
 		const header = document.querySelector("header");
 		const hero = document.querySelector("#hero");
 
-		if (!header || !hero) {
-			return;
-		}
+		if (!header || !hero) return;
 
-		if (window.scrollY >= hero.clientHeight - header.clientHeight) {
-			header.classList.add("bg-secondary");
-		} else {
-			header.classList.remove("bg-secondary");
-		}
-
-		const handleScroll = () => {
+		const updateHeader = () => {
 			if (window.scrollY >= hero.clientHeight - header.clientHeight) {
 				header.classList.add("bg-secondary");
+
+				header.classList.remove("border-b-transparent");
+				header.classList.add("border-b-primary");
 			} else {
 				header.classList.remove("bg-secondary");
+
+				header.classList.remove("border-b-primary");
+				header.classList.add("border-b-transparent");
 			}
 		};
 
-		window.addEventListener("scroll", handleScroll);
+		updateHeader();
+
+		window.addEventListener("scroll", updateHeader);
 
 		return () => {
-			window.removeEventListener("scroll", handleScroll);
+			window.removeEventListener("scroll", updateHeader);
 		};
 	}, []);
 
 	return (
-		<header className="fixed z-40 flex h-20 w-full items-center justify-between px-6 duration-200">
+		<header className="fixed z-40 flex h-20 w-full items-center justify-between border-b border-b-transparent border-opacity-50 px-6 duration-200">
 			<nav className="flex w-full items-center justify-between text-lg uppercase">
 				<div>
 					<a

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type ProjectProps = {
 	name: string;
 	language: string;
@@ -9,23 +11,23 @@ type ProjectProps = {
 
 export default function Project(props: ProjectProps) {
 	return (
-		<div className="border-primary flex w-80 flex-col gap-2 rounded-lg border border-opacity-50 p-4">
+		<div className="flex w-80 flex-col gap-4 rounded-lg border border-primary border-opacity-50 p-4">
 			<div className="flex items-center justify-between">
 				<div className="flex flex-col flex-wrap">
 					<h3 className="text-xl uppercase">
 						{props.name.replaceAll("-", " ")}
 					</h3>
-					<span className="text-primary text-sm text-opacity-75">
+					<span className="text-sm text-primary text-opacity-75">
 						{props.language}
 					</span>
 				</div>
 			</div>
 			<p>{props.description}</p>
-			<div className="text-primary flex flex-wrap gap-2 text-opacity-75">
+			<div className="flex flex-wrap gap-2 text-primary text-opacity-75">
 				{props.topics.map((topic: string) => (
 					<span
 						key={topic}
-						className="border-primary rounded-md border border-opacity-50 p-1 text-xs"
+						className="rounded-md border border-primary border-opacity-50 p-1 text-xs"
 					>
 						{topic}
 					</span>
@@ -33,19 +35,21 @@ export default function Project(props: ProjectProps) {
 			</div>
 			<div className="mt-auto flex gap-2 justify-self-end uppercase">
 				{props.homepage && (
-					<a
+					<Link
 						href={props.homepage}
-						className="border-primary w-full rounded-md border border-opacity-50 text-center duration-200 hover:opacity-75"
+						className="w-full rounded-md border border-primary border-opacity-50 p-[0.1rem] text-center duration-200 hover:opacity-75"
+						target="_blank"
 					>
 						Site
-					</a>
+					</Link>
 				)}
-				<a
+				<Link
 					href={props.html_url}
-					className="border-primary w-full rounded-md border border-opacity-50 text-center duration-200 hover:opacity-75"
+					className="w-full rounded-md border border-primary border-opacity-50 p-[0.1rem] text-center duration-200 hover:opacity-75"
+					target="_blank"
 				>
 					Repo
-				</a>
+				</Link>
 			</div>
 		</div>
 	);

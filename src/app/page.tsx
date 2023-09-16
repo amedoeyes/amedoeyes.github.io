@@ -1,5 +1,6 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import Separator from "@/components/Separator";
 import About from "@/components/sections/About";
 import Contact from "@/components/sections/Contact";
 import Hero from "@/components/sections/Hero";
@@ -11,10 +12,12 @@ export default function Home() {
 			<Header />
 			<main>
 				<Hero />
-				<div className="bg-secondary relative w-full">
-					<div className="m-auto flex max-w-6xl flex-col gap-20 px-8 py-20">
+				<div className="relative w-full bg-secondary">
+					<div className="flex max-w-6xl flex-col gap-10 p-10">
 						<Projects />
+						<Separator />
 						<About />
+						<Separator />
 						<Contact />
 					</div>
 				</div>
