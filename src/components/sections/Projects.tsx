@@ -14,6 +14,8 @@ async function getProject(repo: string) {
 export default async function Projects() {
 	const projectsList = [
 		"amedoeyes/sheets",
+		"amedoeyes/resume",
+		"amedoeyes/retina",
 		"amedoeyes/users-api-laravel",
 		"amedoeyes/oshop",
 		"amedoeyes/numverify",
