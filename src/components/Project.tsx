@@ -1,5 +1,14 @@
 import Link from "next/link";
 
+const languagesIcons = {
+	c: "",
+	"c++": "",
+	typescript: "󰛦",
+	python: "",
+	lua: "",
+	php: "",
+};
+
 export default function Project(props: IProject) {
 	return (
 		<div className="flex w-80 flex-col gap-4 rounded-lg border border-primary border-opacity-50 p-4">
@@ -8,9 +17,16 @@ export default function Project(props: IProject) {
 					<h3 className="text-xl uppercase">
 						{props.name.replaceAll(/[-_]/g, " ")}
 					</h3>
-					<span className="text-sm text-primary text-opacity-75">
-						{props.language}
-					</span>
+					<div className="flex items-center gap-2 text-sm text-primary text-opacity-75">
+						<span className="select-none">
+							{
+								languagesIcons[
+									props.language.toLowerCase() as keyof typeof languagesIcons
+								]
+							}
+						</span>
+						<span>{props.language}</span>
+					</div>
 				</div>
 			</div>
 			<p>{props.description}</p>
