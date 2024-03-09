@@ -46,16 +46,16 @@ export default function ProjectsFilter(props: {
 	};
 
 	const handleSelectChange = (event: React.FormEvent<HTMLSelectElement>) => {
-		const current_value = event.currentTarget.value;
-		const projects = sortProjects(current_value);
+		const currentValue = event.currentTarget.value;
+		const projects = sortProjects(currentValue);
 		originalProjects.current = projects;
 		props.onChange(projects);
-		setSelectValue(current_value);
+		setSelectValue(currentValue);
 	};
 
 	const handleSearchChange = (event: React.FormEvent<HTMLInputElement>) => {
-		const current_value = event.currentTarget.value.toLowerCase();
-		const projects = filterProjects(current_value);
+		const currentValue = event.currentTarget.value.toLowerCase();
+		const projects = filterProjects(currentValue);
 		props.onChange(projects);
 		setSearchValue(event.currentTarget.value);
 	};
