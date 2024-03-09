@@ -27,6 +27,11 @@ export default async function Projects() {
 	];
 
 	const projects = await Promise.all(projectsList.map(getProject));
+	projects.sort((a, b) => {
+		return (
+			new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+		);
+	});
 
 	return (
 		<Section id="projects" title="Projects">
