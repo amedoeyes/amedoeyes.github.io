@@ -55,6 +55,31 @@ export default function ProjectsFilter(props: {
 
 	const handleSearchChange = (event: React.FormEvent<HTMLInputElement>) => {
 		const currentValue = event.currentTarget.value.toLowerCase();
+		if (currentValue === "meow") {
+			const meowProject: IProject = {
+				name: "Meow",
+				language: "Meowian",
+				description:
+					"Meow meow meow meow meow meow meow meow meow meow meow meow meow.",
+				topics: [
+					"meow",
+					"meow",
+					"meow",
+					"meow",
+					"meow",
+					"meow",
+					"meow",
+				],
+				html_url: "https://lingojam.com/Meowian",
+				created_at: new Date().toISOString(),
+				updated_at: new Date().toISOString(),
+				pushed_at: new Date().toISOString(),
+			};
+
+			props.onChange([meowProject]);
+			setSearchValue(event.currentTarget.value);
+			return;
+		}
 		const projects = filterProjects(currentValue);
 		props.onChange(projects);
 		setSearchValue(event.currentTarget.value);

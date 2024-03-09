@@ -7,6 +7,7 @@ const languagesIcons = {
 	python: "",
 	lua: "",
 	php: "",
+	meowian: "󰄛",
 };
 
 export default function Project(props: IProject) {
