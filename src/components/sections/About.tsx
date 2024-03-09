@@ -5,9 +5,9 @@ export default function About() {
 		<Section id="about" title="About">
 			<p className="m-auto max-w-3xl">
 				Hi, I&apos;m Ahmed AbouEleyuon, a GIS graduate currently
-				pursuing a diploma in computer science at the University of
-				Cairo. I&apos;m also gaining valuable experience as a software
-				engineering intern at ALX.
+				pursuing a post graduate degree in computer science at the
+				University of Cairo. I&apos;m also gaining valuable experience
+				as a software engineering intern at ALX.
 				<br />
 				<br />
 				I&apos;m very passionate about computer science and software
