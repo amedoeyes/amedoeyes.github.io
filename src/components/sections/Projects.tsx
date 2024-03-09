@@ -13,6 +13,8 @@ async function getProject(repo: string) {
 
 export default async function Projects() {
 	const projectsList = [
+		"Osama-Elshimy/simple_shell",
+		"amedoeyes/AirBnB_clone",
 		"amedoeyes/sheets",
 		"amedoeyes/resume",
 		"amedoeyes/retina",
