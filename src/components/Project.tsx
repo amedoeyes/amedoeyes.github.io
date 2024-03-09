@@ -1,21 +1,12 @@
 import Link from "next/link";
 
-type ProjectProps = {
-	name: string;
-	language: string;
-	homepage: string;
-	html_url: string;
-	description: string;
-	topics: string[];
-};
-
-export default function Project(props: ProjectProps) {
+export default function Project(props: IProject) {
 	return (
 		<div className="flex w-80 flex-col gap-4 rounded-lg border border-primary border-opacity-50 p-4">
 			<div className="flex items-center justify-between">
 				<div className="flex flex-col flex-wrap">
 					<h3 className="text-xl uppercase">
-						{props.name.replaceAll("-", " ")}
+						{props.name.replaceAll(/[-_]/g, " ")}
 					</h3>
 					<span className="text-sm text-primary text-opacity-75">
 						{props.language}
@@ -37,7 +28,7 @@ export default function Project(props: ProjectProps) {
 				{props.homepage && (
 					<Link
 						href={props.homepage}
-						className="w-full rounded-md border border-primary border-opacity-50 p-[0.1rem] text-center duration-200 hover:opacity-75"
+						className="w-full rounded-md border border-primary border-opacity-50 p-[0.1rem] text-center duration-200 hover:border-opacity-75"
 						target="_blank"
 					>
 						Site
@@ -45,7 +36,7 @@ export default function Project(props: ProjectProps) {
 				)}
 				<Link
 					href={props.html_url}
-					className="w-full rounded-md border border-primary border-opacity-50 p-[0.1rem] text-center duration-200 hover:opacity-75"
+					className="w-full rounded-md border border-primary border-opacity-50 p-[0.1rem] text-center duration-200 hover:border-opacity-75"
 					target="_blank"
 				>
 					Repo

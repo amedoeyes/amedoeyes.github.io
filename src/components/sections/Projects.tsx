@@ -1,5 +1,5 @@
-import Project from "@/components/Project";
 import Section from "@/components/Section";
+import ProjectsList from "./utils/ProjectsList";
 
 async function getProject(repo: string) {
 	const res = await fetch(`https://api.github.com/repos/${repo}`);
@@ -28,11 +28,7 @@ export default async function Projects() {
 
 	return (
 		<Section id="projects" title="Projects">
-			<div className="flex flex-wrap justify-center gap-4">
-				{projects.map((project) => (
-					<Project key={project.name} {...project} />
-				))}
-			</div>
+			<ProjectsList projects={projects} />
 		</Section>
 	);
 }
