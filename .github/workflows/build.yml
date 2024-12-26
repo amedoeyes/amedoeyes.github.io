@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - rewrite
+  workflow_dispatch:
 
 jobs:
   build:
