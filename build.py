@@ -62,7 +62,12 @@ def build():
 
     cache = Cache(build_dir / ".cache.json")
 
-    if cache.changed(main_path) or cache.changed(data_path):
+    temp_changed = False
+    for src in templates_dir.rglob("*"):
+        if cache.changed(src):
+            temp_changed = True
+
+    if temp_changed or cache.changed(data_path):
         with open(data_path, "r") as f:
             data = json.load(f)
 
@@ -89,7 +94,7 @@ def main():
         server.watch(dirs["templates"], build)
         server.watch(dirs["data"], build)
         server.watch(dirs["static"], build)
-        server.serve(root=dirs["build"], open_url_delay=0)
+        server.serve(root=dirs["build"], host="0.0.0.0", open_url_delay=0)
     else:
         build()
 
