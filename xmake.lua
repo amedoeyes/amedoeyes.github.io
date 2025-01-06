@@ -1,8 +1,0 @@
-target("portfolio", function()
-	set_kind("phony")
-	on_build(function()
-		os.mkdir("build")
-		os.exec(string.format("jinja2 %s %s -o %s", "templates/main.html", "data/data.json", "build/index.html"))
-		os.cp(path.join("static", "*"), "build")
-	end)
-end)
