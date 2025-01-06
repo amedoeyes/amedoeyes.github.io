@@ -38,7 +38,6 @@ class Cache:
 
 dirs = {
     "templates": Path("./templates/"),
-    "data": Path("./data/"),
     "static": Path("./static/"),
     "build": Path("./build/"),
 }
@@ -48,14 +47,11 @@ def build():
     build_dir = dirs["build"]
     static_dir = dirs["static"]
     templates_dir = dirs["templates"]
-    data_dir = dirs["data"]
 
     main_file = "main.html"
-    data_file = "data.json"
     render_file = "index.html"
 
     main_path = templates_dir / main_file
-    data_path = data_dir / data_file
     render_path = build_dir / render_file
 
     build_dir.mkdir(parents=True, exist_ok=True)
@@ -67,15 +63,12 @@ def build():
         if cache.changed(src):
             temp_changed = True
 
-    if temp_changed or cache.changed(data_path):
-        with open(data_path, "r") as f:
-            data = json.load(f)
-
+    if temp_changed:
         with open(render_path, "w") as f:
             env = Environment(loader=FileSystemLoader(templates_dir))
             template = env.get_template(main_file)
-            f.write(template.render(data))
-            print(f"Rendered: {main_path} {data_file} -> {render_path}")
+            f.write(template.render())
+            print(f"Rendered: {main_path} -> {render_path}")
 
     for src in static_dir.rglob("*"):
         if src.is_file() and cache.changed(src):
@@ -92,7 +85,6 @@ def main():
         build()
         server = Server()
         server.watch(dirs["templates"], build)
-        server.watch(dirs["data"], build)
         server.watch(dirs["static"], build)
         server.serve(root=dirs["build"], host="0.0.0.0", open_url_delay=0)
     else:
