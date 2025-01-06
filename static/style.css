@@ -20,6 +20,12 @@ body {
 	display: flex;
 }
 
+a {
+	color: #a0a0a0;
+	text-decoration: none;
+	cursor: pointer;
+}
+
 #terminal {
 	background-color: #000000;
 	display: flex;

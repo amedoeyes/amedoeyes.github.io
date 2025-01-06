@@ -1,3 +1,9 @@
 {
-	"about": "Hi. I'm Ahmed AbouEleyuon, a software developer, and a post graduate computer science student at Cairo University. I like low-level and graphics programming, open source, and terminals (haha). I use Arch Linux (BTW), and Neovim. And I love cats."
+	"about": "Hi. I'm Ahmed AbouEleyuon, a software developer, and a post graduate computer science student at Cairo University. I like low-level and graphics programming, open source, and terminals (haha). I use Arch Linux (BTW), and Neovim. And I love cats.",
+	"contact": {
+		"email": "ahmed.m.aboueleyoun@gmail.com",
+		"phone": "+20 100 240 3588",
+		"github": "https://github.com/amedoeyes",
+		"linkedin": "https://linkedin.com/in/ahmed-aboueleyuon"
+	}
 }

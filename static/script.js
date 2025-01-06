@@ -24,6 +24,15 @@
 				output.innerHTML += `<div>${data.about}</div>`;
 			},
 		},
+		contact: {
+			description: "display contact info",
+			call: (_, output) => {
+				output.innerHTML += `<div><a href="mailto:${data.contact.email}">󰇮 ${data.contact.email}</a></div>`;
+				output.innerHTML += `<div><a href="phone:${data.contact.phone}"> ${data.contact.phone}</a></div>`;
+				output.innerHTML += `<div><a href="${data.contact.github}"> ${data.contact.github}</a></div>`;
+				output.innerHTML += `<div><a href="${data.contact.linkedin}"> ${data.contact.linkedin}</a></div>`;
+			},
+		},
 		help: {
 			description: "display this help message",
 			call: (_, output) => {
@@ -56,7 +65,10 @@
 		const caretPos = prompt.selectionStart;
 		if (event.key === "Backspace" && caretPos <= promptPrefix.length) {
 			event.preventDefault();
-		} else if ((event.key === "ArrowLeft" || event.key === "Home") && caretPos <= promptPrefix.length) {
+		} else if (
+			(event.key === "ArrowLeft" || event.key === "ArrowUp" || event.key === "Home") &&
+			caretPos <= promptPrefix.length
+		) {
 			event.preventDefault();
 		}
 	});
