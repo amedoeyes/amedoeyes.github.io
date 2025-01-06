@@ -128,7 +128,7 @@
 				.filter((arg) => arg.length > 0);
 			if (Object.keys(commands).includes(argv[0])) commands[argv[0]].call(argv, output);
 			else if (Object.keys(funny_commands).includes(argv[0])) funny_commands[argv[0]].call(argv, output);
-			else output.innerHTML += `<div>command not found: ${argv[0]}</div>`;
+			else if (argv.length != 0) output.innerHTML += `<div>command not found: ${argv[0]}</div>`;
 			window.scrollTo(0, document.body.scrollHeight);
 			prompt.value = promptPrefix;
 		}
