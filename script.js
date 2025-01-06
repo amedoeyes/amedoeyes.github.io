@@ -73,6 +73,14 @@
 		},
 	};
 
+	const funny_commands = {
+		pspsps: {
+			call: (_, output) => {
+				output.innerHTML += "meow";
+			},
+		},
+	};
+
 	window.onload = () => {
 		prompt.setSelectionRange(promptPrefix.length, promptPrefix.length);
 	};
@@ -80,6 +88,8 @@
 	window.onkeydown = (event) => {
 		if (event.key != "Control") prompt.focus();
 	};
+
+	output.innerHTML = "<div>type <span style='color: #808080'>help</span> to see all commands</div>";
 
 	prompt.value = promptPrefix;
 
@@ -110,6 +120,7 @@
 				.split(" ")
 				.filter((arg) => arg.length > 0);
 			if (Object.keys(commands).includes(argv[0])) commands[argv[0]].call(argv, output);
+			else if (Object.keys(funny_commands).includes(argv[0])) funny_commands[argv[0]].call(argv, output);
 			else output.innerHTML += `<div>command not found: ${argv[0]}</div>`;
 			window.scrollTo(0, document.body.scrollHeight);
 			prompt.value = promptPrefix;

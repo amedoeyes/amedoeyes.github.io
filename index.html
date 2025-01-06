@@ -7,7 +7,10 @@
 		<link href="./style.css" rel="stylesheet" />
 	</head>
 	<body>
-		{% include "terminal.html" %}
+		<div id="terminal">
+			<div id="output"></div>
+			<input id="prompt" type="text" autofocus />
+		</div>
 		<script src="./script.js"></script>
 	</body>
 </html>
