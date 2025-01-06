@@ -79,6 +79,13 @@
 				output.innerHTML += "meow";
 			},
 		},
+		cat: {
+			call: async (_, output) => {
+				const res = await fetch("https://api.thecatapi.com/v1/images/search");
+				const data = await res.json();
+				output.innerHTML += `<img src="${data[0].url}" alt='Cat!'>`;
+			},
+		},
 	};
 
 	window.onload = () => {
