@@ -8,24 +8,28 @@
 	const commands = {
 		echo: {
 			description: "display a line of text",
+			arguments: "[args]...",
 			call: (argv, output) => {
 				output.innerHTML += `<div>${argv.slice(1).join(" ")}</div>`;
 			},
 		},
 		clear: {
 			description: "clear the terminal screen",
+			arguments: "",
 			call: (_, output) => {
 				output.innerHTML = "";
 			},
 		},
 		about: {
 			description: "display info about me",
+			arguments: "",
 			call: (_, output) => {
 				output.innerHTML += `<div>${data.about}</div>`;
 			},
 		},
 		contact: {
 			description: "display contact info",
+			arguments: "",
 			call: (_, output) => {
 				output.innerHTML += `<div><a href="mailto:${data.contact.email}">󰇮 ${data.contact.email}</a></div>`;
 				output.innerHTML += `<div><a href="phone:${data.contact.phone}"> ${data.contact.phone}</a></div>`;
@@ -33,13 +37,37 @@
 				output.innerHTML += `<div><a href="${data.contact.linkedin}"> ${data.contact.linkedin}</a></div>`;
 			},
 		},
+		projects: {
+			description: "display projects or details of a project",
+			arguments: "[project]",
+			call: (argv, output) => {
+				if (argv.length > 1) {
+					project = data.projects.find((p) => p.name === argv[1]);
+					if (project === undefined) {
+						output.innerHTML += `<div>No project with name: ${argv[1]}</div>`;
+						return;
+					}
+					output.innerHTML += `<div><span style="color:#808080">Neme:</span> ${project.name}</div>`;
+					output.innerHTML += `<div><span style="color:#808080">Description:</span> ${project.description}</div>`;
+					output.innerHTML += `<div><span style="color:#808080">Repository:</span> <a href="${project.repository}">${project.repository}</a></div>`;
+					output.innerHTML += `<div><span style="color:#808080">Language:</span> ${project.language}</div>`;
+					return;
+				}
+				let max_name_len = 0;
+				for (const project of data.projects) max_name_len = Math.max(max_name_len, project.name.length);
+				for (const project of data.projects) {
+					output.innerHTML += `<div>${`<span style="color:#808080">${project.name}</span>` + " ".repeat(max_name_len - project.name.length + 4) + project.description}</div>`;
+				}
+			},
+		},
 		help: {
 			description: "display this help message",
+			arguments: "",
 			call: (_, output) => {
 				let max_len = 0;
-				for (const cmd in commands) max_len = Math.max(max_len, cmd.length);
+				for (const cmd in commands) max_len = Math.max(max_len, cmd.length + commands[cmd].arguments.length);
 				for (const cmd in commands) {
-					output.innerHTML += `<div>${cmd + " ".repeat(max_len - cmd.length + 4) + commands[cmd].description}</div>`;
+					output.innerHTML += `<div>${`<span style="color:#808080">${cmd + " " + commands[cmd].arguments}</span>` + " ".repeat(max_len - cmd.length - commands[cmd].arguments.length + 4) + commands[cmd].description}</div>`;
 				}
 			},
 		},
@@ -49,8 +77,8 @@
 		prompt.setSelectionRange(promptPrefix.length, promptPrefix.length);
 	};
 
-	window.onkeydown = () => {
-		prompt.focus();
+	window.onkeydown = (event) => {
+		if (event.key != "Control") prompt.focus();
 	};
 
 	prompt.value = promptPrefix;

@@ -5,5 +5,73 @@
 		"phone": "+20 100 240 3588",
 		"github": "https://github.com/amedoeyes",
 		"linkedin": "https://linkedin.com/in/ahmed-aboueleyuon"
-	}
+	},
+	"projects": [
+		{
+			"name": "void_engine",
+			"description": "Cross platform composition based game engine using OpenGL",
+			"repository": "https://github.com/amedoeyes/void_engine",
+			"language": "C++"
+		},
+		{
+			"name": "mprisctl",
+			"description": "CLI utility to control MPRIS-compatible media players",
+			"repository": "https://github.com/amedoeyes/mprisctl",
+			"language": "C++"
+		},
+		{
+			"name": "simple_shell",
+			"description": "Simple linux shell",
+			"repository": "https://github.com/Osama-Elshimy/simple_shell",
+			"language": "C"
+		},
+		{
+			"name": "retina",
+			"description": "HTTP library for C++",
+			"repository": "https://github.com/amedoeyes/retina",
+			"language": "C++"
+		},
+		{
+			"name": "hadath",
+			"description": "Event booking RESTful API",
+			"repository": "https://github.com/amedoeyes/hadath",
+			"language": "Go"
+		},
+		{
+			"name": "users-api-laravel",
+			"description": "Users API in Laravel",
+			"repository": "https://github.com/amedoeyes/users-api-laravel",
+			"language": "PHP"
+		},
+		{
+			"name": "resume",
+			"description": "Online tool for crafting professional resumes",
+			"repository": "https://github.com/amedoeyes/resume",
+			"language": "TypeScript"
+		},
+		{
+			"name": "sheets",
+			"description": "Progressive web app for creating and managing roads survey spreadsheets.",
+			"repository": "https://github.com/amedoeyes/sheets",
+			"language": "TypeScript"
+		},
+		{
+			"name": "oshop",
+			"description": "React e-commerce front-end",
+			"repository": "https://github.com/amedoeyes/oshop",
+			"language": "TypeScript"
+		},
+		{
+			"name": "numverify",
+			"description": "Full-stack application that uses the Numverify API to verify phone numbers",
+			"repository": "https://github.com/amedoeyes/numverify",
+			"language": "JavaScript"
+		},
+		{
+			"name": "eyes.nvim",
+			"description": "Monochrome colorscheme for Neovim",
+			"repository": "https://github.com/amedoeyes/eyes.nvim",
+			"language": "lua"
+		}
+	]
 }
