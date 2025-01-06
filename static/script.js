@@ -16,6 +16,12 @@ const commands = {
 			output.innerHTML = "";
 		},
 	},
+	about: {
+		description: "display info about me",
+		call: (_, output) => {
+			output.innerHTML += `<div>Hi. I'm Ahmed AbouEleyuon, a software developer, and a post graduate computer science student at Cairo University. I like low-level and graphics programming, open source, and terminals (haha). I use Arch Linux (BTW), and Neovim. And I love cats.</div>`;
+		},
+	},
 	help: {
 		description: "display this help message",
 		call: (_, output) => {
