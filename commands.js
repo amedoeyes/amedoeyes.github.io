@@ -67,6 +67,16 @@ const commands = {
 		},
 	},
 
+	resume: {
+		description: "open to my resume",
+		arguments: null,
+		hidden: false,
+		action: (_) => {
+			window.location.href = "./ahmed_aboueleyoun_resume.pdf";
+			return nul;
+		},
+	},
+
 	echo: {
 		description: "display a line of text",
 		arguments: "[args]...",
