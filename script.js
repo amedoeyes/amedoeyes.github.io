@@ -5,8 +5,22 @@ const outputElement = document.querySelector("#output");
 
 outputElement.innerHTML = "<div>type <span style='color: #808080'>help</span> to see all commands</div>";
 
-promptElement.addEventListener("keydown", (event) => {
-	if (event.key === "Enter") {
+window.onkeydown = (e) => {
+	if (e.ctrlKey) {
+		if (e.key === "l") {
+			outputElement.innerHTML = "";
+		} else if (e.key === "c" && window.getSelection().toString().length == 0) {
+			outputElement.innerHTML += `<div>$ ${promptElement.value}</div>`;
+			promptElement.value = "";
+			window.scrollTo(0, document.body.scrollHeight);
+		}
+	} else {
+		promptElement.focus();
+	}
+};
+
+promptElement.addEventListener("keydown", (e) => {
+	if (e.key === "Enter") {
 		outputElement.innerHTML += `<div>$ ${promptElement.value}</div>`;
 
 		const argv = promptElement.value
