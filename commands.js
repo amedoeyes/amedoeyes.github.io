@@ -28,7 +28,7 @@ const commands = {
 		hidden: false,
 		action: (argv) => {
 			if (argv.length > 1) {
-				project = data.projects.find((p) => p.name === argv[1]);
+				const project = data.projects.find((p) => p.name === argv[1]);
 				if (project === undefined) {
 					return `<div>No project found with name '${argv[1]}'</div>`;
 				}
@@ -82,7 +82,7 @@ const commands = {
 	},
 
 	cat: {
-		description: "meow",
+		description: "cat!",
 		arguments: null,
 		hidden: false,
 		action: async (_) => {
