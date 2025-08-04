@@ -1,76 +1,79 @@
 import commands from "./commands.js";
+import History from "./history.js";
 
-const history = [];
-let histIdx = -1;
-let histTemp = null;
+let history = new History();
+let tempValue = null;
 
 const promptElement = document.querySelector("#prompt input");
 const outputElement = document.querySelector("#output");
 
 outputElement.innerHTML = "<div>type <span style='color: #808080'>help</span> to see all commands</div>";
 
-window.onkeydown = (e) => {
+window.addEventListener("keydown", (e) => {
+	if (!e.ctrlKey && !e.metaKey) {
+		promptElement.focus();
+	}
+});
+
+window.addEventListener("keydown", (e) => {
 	if (e.ctrlKey && e.key === "l") {
 		outputElement.innerHTML = "";
 	}
 
-	if (e.ctrlKey && e.key === "c" && window.getSelection().toString().length == 0) {
+	if (e.ctrlKey && e.key === "c" && window.getSelection().toString().length === 0) {
 		outputElement.innerHTML += `<div>$ ${promptElement.value}</div>`;
 		promptElement.value = "";
 		window.scrollTo(0, document.body.scrollHeight);
 	}
+});
 
-	if (e.ctrlKey && e.key === "w") {
-		outputElement.innerHTML = "";
-	}
-
-	if ((e.key === "ArrowUp" || (e.ctrlKey && e.key == "p")) && histIdx < history.length - 1) {
-		if (histIdx == -1) {
-			histTemp = promptElement.value;
-		}
-		histIdx += 1;
-		promptElement.value = history[histIdx];
-	}
-
-	if ((e.key === "ArrowDown" || (e.ctrlKey && e.key == "n")) && histIdx > -1) {
-		histIdx -= 1;
-		if (histIdx == -1) {
-			promptElement.value = histTemp;
-			histTemp = null;
-		} else {
-			promptElement.value = history[histIdx];
-		}
-	}
-
-	if (!e.ctrlKey) {
-		promptElement.focus();
-	}
-};
-
-promptElement.addEventListener("keydown", async (e) => {
-	if (e.key === "Enter") {
-		const value = e.target.value;
-
-		history.unshift(value);
-		histIdx = -1;
-
-		outputElement.innerHTML += `<div>$ ${value}</div>`;
-		promptElement.value = "";
-
-		const argv = value
-			.trim()
-			.split(" ")
-			.filter((arg) => arg.length > 0);
-
-		if (Object.keys(commands).includes(argv[0])) {
-			const out = await commands[argv[0]].action(argv);
-			if (out != null) {
-				outputElement.innerHTML += out;
+window.addEventListener("keydown", (e) => {
+	if (e.key === "ArrowUp" || (e.ctrlKey && e.key === "p")) {
+		const entry = history.prev();
+		if (entry !== null) {
+			if (tempValue === null) {
+				tempValue = promptElement.value;
 			}
-		} else if (argv.length != 0) {
-			outputElement.innerHTML += `<div>command not found: ${argv[0]}</div>`;
+			promptElement.value = entry;
 		}
-
-		window.scrollTo(0, document.body.scrollHeight);
 	}
+
+	if (e.key === "ArrowDown" || (e.ctrlKey && e.key === "n")) {
+		const entry = history.next();
+		if (entry !== null) {
+			promptElement.value = entry;
+		} else {
+			if (tempValue !== null) {
+				promptElement.value = tempValue;
+				tempValue = null;
+			}
+		}
+	}
+});
+
+window.addEventListener("keydown", async (e) => {
+	if (e.key !== "Enter") return;
+
+	const value = promptElement.value;
+
+	outputElement.innerHTML += `<div>$ ${value}</div>`;
+	promptElement.value = "";
+
+	history.add(value);
+
+	const argv = value
+		.trim()
+		.split(" ")
+		.filter((arg) => arg.length > 0);
+
+	if (Object.keys(commands).includes(argv[0])) {
+		const out = await commands[argv[0]].action(argv);
+		if (out != null) {
+			outputElement.innerHTML += out;
+		}
+	} else if (argv.length != 0) {
+		outputElement.innerHTML += `<div>command not found: ${argv[0]}</div>`;
+	}
+
+	window.scrollTo(0, document.body.scrollHeight);
 });
