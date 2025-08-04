@@ -38,6 +38,10 @@ a {
 }
 
 #prompt {
+	display: flex;
+}
+
+#prompt input {
 	background-color: transparent;
 	border: none;
 	caret-shape: block;
@@ -45,6 +49,12 @@ a {
 	outline: none;
 	padding: 0;
 	width: 100%;
+}
+
+#prompt span::before {
+	content: "$";
+	padding-right: 1ch;
+	pointer-events: none;
 }
 
 @media screen and (max-width: 400px) {
