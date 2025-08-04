@@ -30,7 +30,10 @@ promptElement.addEventListener("keydown", (e) => {
 		promptElement.value = "";
 
 		if (Object.keys(commands).includes(argv[0])) {
-			commands[argv[0]].action(argv, outputElement);
+			const out = commands[argv[0]].action(argv);
+			if (out != null) {
+				outputElement.innerHTML += out;
+			}
 		} else if (argv.length != 0) {
 			outputElement.innerHTML += `<div>command not found: ${argv[0]}</div>`;
 		}

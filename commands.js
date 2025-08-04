@@ -5,8 +5,8 @@ const commands = {
 		description: "display info about me",
 		arguments: null,
 		hidden: false,
-		action: (_, output) => {
-			output.innerHTML += `<div>${data.about}</div>`;
+		action: (_) => {
+			return `<div>${data.about}</div>`;
 		},
 	},
 
@@ -14,9 +14,11 @@ const commands = {
 		description: "display contact info",
 		arguments: null,
 		hidden: false,
-		action: (_, output) => {
-			output.innerHTML += `<div><a href="mailto:${data.contact.email}">󰇮 ${data.contact.email}</a></div>`;
-			output.innerHTML += `<div><a href="${data.contact.github}"> ${data.contact.github}</a></div>`;
+		action: (_) => {
+			let out = "";
+			out += `<div><a href="mailto:${data.contact.email}">󰇮 ${data.contact.email}</a></div>`;
+			out += `<div><a href="${data.contact.github}"> ${data.contact.github}</a></div>`;
+			return out;
 		},
 	},
 
@@ -24,19 +26,19 @@ const commands = {
 		description: "display projects or details of a project",
 		arguments: "[project]",
 		hidden: false,
-		action: (argv, output) => {
+		action: (argv) => {
 			if (argv.length > 1) {
 				project = data.projects.find((p) => p.name === argv[1]);
 				if (project === undefined) {
-					output.innerHTML += `<div>No project found with name '${argv[1]}'</div>`;
-					return;
+					return `<div>No project found with name '${argv[1]}'</div>`;
 				}
 
-				output.innerHTML += `<div><span style="color:#808080">Neme:</span> ${project.name}</div>`;
-				output.innerHTML += `<div><span style="color:#808080">Description:</span> ${project.description}</div>`;
-				output.innerHTML += `<div><span style="color:#808080">Repository:</span> <a href="${project.repository}">${project.repository}</a></div>`;
-				output.innerHTML += `<div><span style="color:#808080">Language:</span> ${project.language}</div>`;
-				return;
+				let out = "";
+				out += `<div><span style="color:#808080">Neme:</span> ${project.name}</div>`;
+				out += `<div><span style="color:#808080">Description:</span> ${project.description}</div>`;
+				out += `<div><span style="color:#808080">Repository:</span> <a href="${project.repository}">${project.repository}</a></div>`;
+				out += `<div><span style="color:#808080">Language:</span> ${project.language}</div>`;
+				return out;
 			}
 
 			let maxNameLen =
@@ -45,12 +47,15 @@ const commands = {
 					.sort()
 					.reverse()[0] + 4;
 
+			let out = "";
 			for (const project of data.projects) {
 				const name = `<a href="${project.repository}" style="color:#808080">${project.name}</a>`;
 				const padding = " ".repeat(maxNameLen - project.name.length);
 				const description = project.description;
-				output.innerHTML += `<div>${name + padding + description}</div>`;
+				out += `<div>${name + padding + description}</div>`;
 			}
+
+			return out;
 		},
 	},
 
@@ -58,8 +63,11 @@ const commands = {
 		description: "display a line of text",
 		arguments: "[args]...",
 		hidden: false,
-		action: (argv, output) => {
-			output.innerHTML += `<div>${argv.slice(1).join(" ")}</div>`;
+		action: (argv) => {
+			if (argv.slice(1).length == 0) {
+				return "<div> </div>";
+			}
+			return `<div>${argv.slice(1).join(" ")}</div>`;
 		},
 	},
 
@@ -67,8 +75,9 @@ const commands = {
 		description: "clear the terminal screen",
 		arguments: null,
 		hidden: false,
-		action: (_, output) => {
-			output.innerHTML = "";
+		action: (_) => {
+			document.querySelector("#output").innerHTML = "";
+			return null;
 		},
 	},
 
@@ -76,13 +85,14 @@ const commands = {
 		description: "meow",
 		arguments: null,
 		hidden: false,
-		action: async (_, output) => {
+		action: async (_) => {
 			const res = await fetch("https://api.thecatapi.com/v1/images/search");
 			const data = await res.json();
-			output.innerHTML += `<div><img src="${data[0].url}" style="width:50%" alt="Cat!"></div>`;
+			const out = `<div><img src="${data[0].url}" style="width:50%" alt="Cat!"></div>`;
 			setTimeout(() => {
 				window.scrollTo(0, document.body.scrollHeight);
 			}, 200);
+			return out;
 		},
 	},
 
@@ -90,8 +100,8 @@ const commands = {
 		description: null,
 		arguments: null,
 		hidden: true,
-		action: (_, output) => {
-			output.innerHTML += "meow";
+		action: (_) => {
+			return "meow";
 		},
 	},
 
@@ -99,13 +109,14 @@ const commands = {
 		description: "display this help message",
 		arguments: null,
 		hidden: false,
-		action: (_, output) => {
+		action: (_) => {
 			let maxUsageLen =
 				Object.keys(commands)
 					.map((cmd) => cmd.length + (commands[cmd].arguments?.length ?? 0))
 					.sort((a, b) => a - b)
 					.reverse()[0] + 4;
 
+			let out = "";
 			for (const cmd in commands) {
 				if (commands[cmd].hidden) {
 					continue;
@@ -114,8 +125,10 @@ const commands = {
 				const usage = `<span style="color:#808080">${cmd + " " + (commands[cmd].arguments ?? "")}</span>`;
 				const padding = `<span>${" ".repeat(maxUsageLen - cmd.length - (commands[cmd].arguments?.length ?? 0))}</span>`;
 				const description = commands[cmd].description;
-				output.innerHTML += `<div>${usage + padding + description}</div>`;
+				out += `<div>${usage + padding + description}</div>`;
 			}
+
+			return out;
 		},
 	},
 };
