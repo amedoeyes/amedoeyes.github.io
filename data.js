@@ -1,52 +1,59 @@
 export default {
 	about:
-		"Hi. I'm Ahmed AbouEleyuon, a software developer, and a post graduate computer science student at Cairo University. I like low-level and graphics programming, open source, and terminals (haha). I use Arch Linux (BTW), and Neovim. And I love cats.",
-	contact: {
-		email: "ahmed.m.aboueleyoun@gmail.com",
-		phone: "+20 100 240 3588",
-		github: "https://github.com/amedoeyes",
-		linkedin: "https://linkedin.com/in/ahmed-aboueleyuon",
-	},
+		"Hi, I'm Ahmed, a software developer passionate about systems and graphics programming. I like computers and cats.",
+	contact: [
+		{
+			type: "mail",
+			name: "Email",
+			body: "amedoeyes@gmail.com",
+		},
+		{
+			type: "link",
+			name: "Github",
+			body: "https://github.com/amedoeyes",
+		},
+	],
 	projects: [
 		{
-			name: "void_engine",
-			description: "Cross platform composition based game engine using OpenGL",
-			repository: "https://github.com/amedoeyes/void_engine",
-			language: "C++",
+			name: "void-lang",
+			description: "Statically typed functional programming language.",
+			repository: "https://github.com/amedoeyes/void-lang",
+			language: "Rust",
 		},
 		{
-			name: "mprisctl",
-			description: "CLI utility to control MPRIS-compatible media players",
-			repository: "https://github.com/amedoeyes/mprisctl",
-			language: "C++",
-		},
-		{
-			name: "simple_shell",
-			description: "Simple linux shell",
-			repository: "https://github.com/Osama-Elshimy/simple_shell",
-			language: "C",
-		},
-		{
-			name: "retina",
-			description: "HTTP library for C++",
-			repository: "https://github.com/amedoeyes/retina",
-			language: "C++",
-		},
-		{
-			name: "hadath",
-			description: "Event booking RESTful API",
-			repository: "https://github.com/amedoeyes/hadath",
+			name: "mason",
+			description:
+				"Command-line tool to manage external development tools like LSP servers, debuggers, linters, and formatters.",
+			repository: "https://github.com/amedoeyes/mason",
 			language: "Go",
 		},
 		{
-			name: "users-api-laravel",
-			description: "Users API in Laravel",
-			repository: "https://github.com/amedoeyes/users-api-laravel",
-			language: "PHP",
+			name: "mprisctl",
+			description: "Command-line tool to interact with MPRIS compatible media players.",
+			repository: "https://github.com/amedoeyes/mprisctl",
+			language: "Rust",
+		},
+		{
+			name: "void-engine",
+			description: "Cross platform C++23 game engine.",
+			repository: "https://github.com/amedoeyes/void-engine",
+			language: "C++",
+		},
+		{
+			name: "cli",
+			description: "Simple modern C++23 command-line interface library.",
+			repository: "https://github.com/amedoeyes/cli",
+			language: "C++",
+		},
+		{
+			name: "lexer",
+			description: "Modular modern C++23 lexer library.",
+			repository: "https://github.com/amedoeyes/lexer",
+			language: "C++",
 		},
 		{
 			name: "resume",
-			description: "Online tool for crafting professional resumes",
+			description: "Online tool for crafting professional resumes.",
 			repository: "https://github.com/amedoeyes/resume",
 			language: "TypeScript",
 		},
@@ -57,22 +64,16 @@ export default {
 			language: "TypeScript",
 		},
 		{
-			name: "oshop",
-			description: "React e-commerce front-end",
-			repository: "https://github.com/amedoeyes/oshop",
-			language: "TypeScript",
-		},
-		{
-			name: "numverify",
-			description: "Full-stack application that uses the Numverify API to verify phone numbers",
-			repository: "https://github.com/amedoeyes/numverify",
-			language: "JavaScript",
-		},
-		{
 			name: "eyes.nvim",
 			description: "Monochrome colorscheme for Neovim",
 			repository: "https://github.com/amedoeyes/eyes.nvim",
 			language: "lua",
+		},
+		{
+			name: "portofolio",
+			description: "This protofolio",
+			repository: "https://github.com/amedoeyes/amedoeyes.github.io",
+			language: "Javascript",
 		},
 	],
 };

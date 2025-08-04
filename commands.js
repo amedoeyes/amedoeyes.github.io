@@ -16,8 +16,16 @@ const commands = {
 		hidden: false,
 		action: (_) => {
 			let out = "";
-			out += `<div><a href="mailto:${data.contact.email}">󰇮 ${data.contact.email}</a></div>`;
-			out += `<div><a href="${data.contact.github}"> ${data.contact.github}</a></div>`;
+			for (const contact of data.contact) {
+				switch (contact.type) {
+					case "mail":
+						out += `<div>${contact.name}: <a href="mailto:${contact.body}">${contact.body}</a></div>`;
+						break;
+					case "link":
+						out += `<div>${contact.name}: <a href="${contact.body}">${contact.body}</a></div>`;
+						break;
+				}
+			}
 			return out;
 		},
 	},
