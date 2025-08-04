@@ -1,10 +1,11 @@
-@import url("./font/JetBrainsMonoNerdFont.css");
+@font-face {
+	font-family: font;
+	src: url("./font.ttf") format("truetype");
+}
 
 * {
 	cursor: text;
-	font-family:
-		JetBrains Mono,
-		monospace;
+	font-family: font;
 	font-size: 16px;
 }
 
