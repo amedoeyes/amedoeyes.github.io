@@ -106,7 +106,7 @@ const commands = {
 		action: async (_) => {
 			const res = await fetch("https://api.thecatapi.com/v1/images/search");
 			const data = await res.json();
-			return `<div><img src="${data[0].url}" style="width:50%" alt="Cat!"></div>`;
+			return `<div><img src="${data[0].url}" style="height:25vw" alt="Cat!"></div>`;
 		},
 	},
 
