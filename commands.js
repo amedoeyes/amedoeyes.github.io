@@ -99,6 +99,16 @@ const commands = {
 		},
 	},
 
+	exit: {
+		description: "close the terminal",
+		arguments: null,
+		hidden: false,
+		action: (_) => {
+			window.open("", "_self").close();
+			return null;
+		},
+	},
+
 	cat: {
 		description: "cat!",
 		arguments: null,

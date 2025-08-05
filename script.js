@@ -25,6 +25,10 @@ window.addEventListener("keydown", (e) => {
 		promptElement.value = "";
 		window.scrollTo(0, document.body.scrollHeight);
 	}
+
+	if (e.ctrlKey && e.key === "d") {
+		window.open("", "_self").close();
+	}
 });
 
 window.addEventListener("keydown", (e) => {
