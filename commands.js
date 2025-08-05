@@ -114,12 +114,14 @@ const commands = {
 		},
 	},
 
-	pspsps: {
-		description: null,
+	joke: {
+		description: "funny computer joke",
 		arguments: null,
-		hidden: true,
-		action: (_) => {
-			return "meow";
+		hidden: false,
+		action: async (_) => {
+			const res = await fetch("https://v2.jokeapi.dev/joke/Programming?type=single");
+			const data = await res.json();
+			return `<div>${data.joke}</div>`;
 		},
 	},
 
@@ -147,6 +149,37 @@ const commands = {
 			}
 
 			return out;
+		},
+	},
+
+	sudo: {
+		description: null,
+		arguments: null,
+		hidden: true,
+		action: (_) => {
+			return "meow";
+		},
+	},
+
+	ls: {
+		description: null,
+		arguments: null,
+		hidden: true,
+		action: (_) => {
+			return [
+				"fluffy_mittens.jpg",
+				"garfield_the_menace.png",
+				"nyan_cat_4k.webm",
+				"cat_overlords_plan.txt",
+				"void_cat_blackhole.gif",
+				"toe_beans_closeup.jpeg",
+				"cat_meme_final_final_v2.jpg",
+				"keyboard_cat_2.0.mp4",
+				"not_a_cat.exe",
+				"lasagna_stealer.png",
+				"cat_riding_roomba.mov",
+				"404_cat_not_found.jpg",
+			].join("  ");
 		},
 	},
 };
