@@ -140,7 +140,7 @@ const commands = {
 				Object.keys(commands)
 					.map((cmd) => cmd.length + (commands[cmd].arguments?.length ?? 0))
 					.sort((a, b) => a - b)
-					.reverse()[0] + 4;
+					.reverse()[0] + 2;
 
 			let out = "";
 			for (const cmd in commands) {
