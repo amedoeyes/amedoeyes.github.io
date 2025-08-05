@@ -65,13 +65,13 @@ export default {
 		},
 		{
 			name: "eyes.nvim",
-			description: "Monochrome colorscheme for Neovim",
+			description: "Monochrome colorscheme for Neovim.",
 			repository: "https://github.com/amedoeyes/eyes.nvim",
 			language: "lua",
 		},
 		{
 			name: "portofolio",
-			description: "This protofolio",
+			description: "This protofolio.",
 			repository: "https://github.com/amedoeyes/amedoeyes.github.io",
 			language: "Javascript",
 		},
