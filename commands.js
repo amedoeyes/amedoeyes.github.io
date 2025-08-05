@@ -106,11 +106,7 @@ const commands = {
 		action: async (_) => {
 			const res = await fetch("https://api.thecatapi.com/v1/images/search");
 			const data = await res.json();
-			const out = `<div><img src="${data[0].url}" style="width:50%" alt="Cat!"></div>`;
-			setTimeout(() => {
-				window.scrollTo(0, document.body.scrollHeight);
-			}, 200);
-			return out;
+			return `<div><img src="${data[0].url}" style="width:50%" alt="Cat!"></div>`;
 		},
 	},
 

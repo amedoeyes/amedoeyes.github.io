@@ -66,14 +66,25 @@ window.addEventListener("keydown", async (e) => {
 		.split(" ")
 		.filter((arg) => arg.length > 0);
 
+	let out = null;
 	if (Object.keys(commands).includes(argv[0])) {
-		const out = await commands[argv[0]].action(argv);
-		if (out != null) {
-			outputElement.innerHTML += out;
-		}
+		out = await commands[argv[0]].action(argv);
 	} else if (argv.length != 0) {
-		outputElement.innerHTML += `<div>command not found: ${argv[0]}</div>`;
+		out = `<div>command not found: ${argv[0]}</div>`;
 	}
 
-	window.scrollTo(0, document.body.scrollHeight);
+	if (out != null) {
+		outputElement.innerHTML += out;
+
+		const lastElement = outputElement.lastElementChild;
+		const img = lastElement.querySelector("img:last-child");
+
+		if (img && !img.complete) {
+			img.onload = () => {
+				window.scrollTo(0, document.body.scrollHeight);
+			};
+		}
+
+		window.scrollTo(0, document.body.scrollHeight);
+	}
 });
