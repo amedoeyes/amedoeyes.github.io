@@ -110,17 +110,6 @@ const commands = {
 		},
 	},
 
-	joke: {
-		description: "funny computer joke",
-		arguments: null,
-		hidden: false,
-		action: async (_) => {
-			const res = await fetch("https://v2.jokeapi.dev/joke/Programming?type=single");
-			const data = await res.json();
-			return `<div>${data.joke}</div>`;
-		},
-	},
-
 	help: {
 		description: "display this help message",
 		arguments: null,
