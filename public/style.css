@@ -1,0 +1,67 @@
+@font-face {
+	font-family: font;
+	src: url("./font.ttf") format("truetype");
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	cursor: text;
+	font-family: font;
+	font-size: 1rem;
+}
+
+body {
+	background: #000000;
+	color: #a0a0a0;
+	word-break: break-all;
+	margin: 1ch;
+}
+
+input {
+	background: #000000;
+	color: #a0a0a0;
+	border: none;
+	outline: none;
+}
+
+textarea {
+	background: #000000;
+	color: #a0a0a0;
+	border: none;
+	outline: none;
+	field-sizing: content;
+	resize: none;
+}
+
+a {
+	color: #a0a0a0;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.output {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.output > div {
+	width: 100%;
+	min-height: 1lh;
+	white-space: pre-wrap;
+}
+
+.output > img {
+	height: 25vw;
+	width: fit-content;
+}
+
+.shell-line {
+	display: flex;
+}
+
+.shell-line-prompt {
+	display: flex;
+	white-space: pre-wrap;
+}
