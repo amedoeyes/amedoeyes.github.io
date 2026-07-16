@@ -5,7 +5,9 @@ const commands = {
 		description: "display info about me",
 		arguments: null,
 		hidden: false,
-		action: (_) => `<div>${data.about}</div>`,
+		action: (_) => {
+			return `<div>${data.about}</div>`;
+		},
 	},
 
 	contact: {
@@ -71,7 +73,7 @@ const commands = {
 		hidden: false,
 		action: (_) => {
 			window.location.href = "./ahmed_aboueleyoun_resume.pdf";
-			return null;
+			return nul;
 		},
 	},
 
@@ -79,7 +81,12 @@ const commands = {
 		description: "display a line of text",
 		arguments: "[args]...",
 		hidden: false,
-		action: (argv) => (argv.slice(1).length == 0 ? "<div> </div>" : `<div>${argv.slice(1).join(" ")}</div>`),
+		action: (argv) => {
+			if (argv.slice(1).length == 0) {
+				return "<div> </div>";
+			}
+			return `<div>${argv.slice(1).join(" ")}</div>`;
+		},
 	},
 
 	clear: {
@@ -134,15 +141,17 @@ const commands = {
 		description: null,
 		arguments: null,
 		hidden: true,
-		action: (_) => "meow",
+		action: (_) => {
+			return "meow";
+		},
 	},
 
 	ls: {
 		description: null,
 		arguments: null,
 		hidden: true,
-		action: (_) =>
-			 [
+		action: (_) => {
+			return [
 				"fluffy_mittens.jpg",
 				"garfield_the_menace.png",
 				"nyan_cat_4k.webm",
@@ -155,7 +164,7 @@ const commands = {
 				"lasagna_stealer.png",
 				"cat_riding_roomba.mov",
 				"404_cat_not_found.jpg",
-			].join("  ")
+			].join("  ");
 		},
 	},
 };
