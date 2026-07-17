@@ -4,11 +4,13 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events exposing (onKeyPress)
 import Dict exposing (Dict)
+import FS
 import Html exposing (Attribute, Html, div, img, main_, span, text, textarea)
-import Html.Attributes exposing (alt, autofocus, class, id, src, style, value)
+import Html.Attributes exposing (autofocus, class, id, src, style, value)
 import Html.Events exposing (onInput, preventDefaultOn)
 import Http
 import Json.Decode as Decode
+import RichText exposing (..)
 import Task
 
 
@@ -35,22 +37,13 @@ type alias Model =
     { prompt : String
     , history : List String
     , output : List Output
+    , pwd : String
     }
 
 
 type Output
     = Text (List Text)
     | Image String
-
-
-type Text
-    = Plain String
-    | Styled String (List Style)
-
-
-type Style
-    = Color String
-    | Bold
 
 
 type alias Command =
@@ -66,6 +59,23 @@ type alias Command =
 prompt : String
 prompt =
     "$ "
+
+
+fileSystem : FS.Node
+fileSystem =
+    FS.Directory ""
+        [ FS.File "hello.txt" [ [ Plain "Hello world!" ] ]
+        , FS.File "hello_lines.txt" [ [ Plain "Hello" ], [ Plain "world!" ] ]
+        , FS.File "file1.txt" [ [ Plain "file 1" ] ]
+        , FS.File "file2.txt" [ [ Plain "file 2" ] ]
+        , FS.Directory "dir"
+            [ FS.File "file1.txt" [ [ Plain "file 1" ] ]
+            , FS.File "file2.txt" [ [ Plain "file 2" ] ]
+            , FS.Directory "subdir"
+                [ FS.File "file1.txt" [ [ Plain "file 1" ] ]
+                ]
+            ]
+        ]
 
 
 commands : Dict String Command
@@ -93,20 +103,156 @@ commands =
             , run = \_ model -> ( { model | output = [] }, Cmd.none )
             }
           )
-        , ( "cat"
-          , { name = "cat"
+        , ( "pwd"
+          , { name = "pwd"
             , arguments = ""
-            , description = "cat!"
+            , description = "output the current working directory"
             , minArgs = 0
             , maxArgs = Nothing
             , run =
                 \_ model ->
-                    ( model
-                    , Http.get
-                        { url = "https://api.thecatapi.com/v1/images/search"
-                        , expect = Http.expectJson GotImage (Decode.index 0 (Decode.field "url" Decode.string))
-                        }
-                    )
+                    let
+                        output =
+                            [ Text [ Plain model.pwd ] ]
+                    in
+                    ( { model | output = model.output ++ output }, Cmd.none )
+            }
+          )
+        , ( "cd"
+          , { name = "cd"
+            , arguments = "[DIRECTORY]"
+            , description = "change directory"
+            , minArgs = 0
+            , maxArgs = Just 1
+            , run =
+                \args model ->
+                    let
+                        ( pwd, output ) =
+                            case args of
+                                [] ->
+                                    ( "/", model.output )
+
+                                path :: _ ->
+                                    let
+                                        newPath =
+                                            if String.startsWith "/" path then
+                                                path
+
+                                            else
+                                                model.pwd ++ "/" ++ path
+                                    in
+                                    case FS.resolvePath newPath fileSystem of
+                                        Nothing ->
+                                            ( model.pwd, model.output ++ [ Text [ Plain ("Error: '" ++ path ++ "' no such file or directory") ] ] )
+
+                                        Just node ->
+                                            case node of
+                                                FS.File _ _ ->
+                                                    ( model.pwd, model.output ++ [ Text [ Plain ("Error: '" ++ path ++ "' is not a directory") ] ] )
+
+                                                FS.Directory _ _ ->
+                                                    ( "/" ++ (FS.normalizePath newPath |> String.join "/"), model.output )
+                    in
+                    ( { model | output = output, pwd = pwd }, Cmd.none )
+            }
+          )
+        , ( "ls"
+          , { name = "ls"
+            , arguments = "[FILE]"
+            , description = "list directory contents"
+            , minArgs = 0
+            , maxArgs = Just 1
+            , run =
+                \args model ->
+                    let
+                        output =
+                            case args of
+                                [] ->
+                                    case FS.resolvePath model.pwd fileSystem of
+                                        Nothing ->
+                                            [ Text [ Plain ("Error: '" ++ model.pwd ++ "' no such file or directory") ] ]
+
+                                        Just node ->
+                                            [ Text (FS.list node) ]
+
+                                path :: _ ->
+                                    case FS.resolvePath (model.pwd ++ "/" ++ path) fileSystem of
+                                        Nothing ->
+                                            [ Text [ Plain ("Error: '" ++ path ++ "' no such file or directory") ] ]
+
+                                        Just node ->
+                                            [ Text (FS.list node) ]
+                    in
+                    ( { model | output = model.output ++ output }, Cmd.none )
+            }
+          )
+        , ( "tree"
+          , { name = "tree"
+            , arguments = "[FILE]"
+            , description = "list contents of directories in a tree-like format"
+            , minArgs = 0
+            , maxArgs = Just 1
+            , run =
+                \args model ->
+                    let
+                        output =
+                            case args of
+                                [] ->
+                                    case FS.resolvePath model.pwd fileSystem of
+                                        Nothing ->
+                                            [ Text [ Plain ("Error: '" ++ model.pwd ++ "' no such file or directory") ] ]
+
+                                        Just node ->
+                                            FS.tree node |> List.map (List.singleton >> Text)
+
+                                path :: _ ->
+                                    case FS.resolvePath (model.pwd ++ "/" ++ path) fileSystem of
+                                        Nothing ->
+                                            [ Text [ Plain ("Error: '" ++ path ++ "' no such file or directory") ] ]
+
+                                        Just node ->
+                                            FS.tree node |> List.map (List.singleton >> Text)
+                    in
+                    ( { model | output = model.output ++ output }, Cmd.none )
+            }
+          )
+        , ( "cat"
+          , { name = "cat"
+            , arguments = "FILE..."
+            , description = "concatenate files and output them"
+            , minArgs = 0
+            , maxArgs = Nothing
+            , run =
+                \args model ->
+                    let
+                        output =
+                            args
+                                |> List.concatMap
+                                    (\path ->
+                                        case FS.resolvePath (model.pwd ++ "/" ++ path) fileSystem of
+                                            Nothing ->
+                                                [ Text [ Plain ("Error: '" ++ path ++ "' no such file or directory") ] ]
+
+                                            Just node ->
+                                                case node of
+                                                    FS.File _ content ->
+                                                        content |> List.map Text
+
+                                                    FS.Directory _ _ ->
+                                                        [ Text [ Plain ("Error: '" ++ path ++ "' is a directory") ] ]
+                                    )
+                                |> List.append model.output
+                    in
+                    if List.isEmpty args then
+                        ( model
+                        , Http.get
+                            { url = "https://api.thecatapi.com/v1/images/search"
+                            , expect = Http.expectJson GotImage (Decode.index 0 (Decode.field "url" Decode.string))
+                            }
+                        )
+
+                    else
+                        ( { model | output = output }, Cmd.none )
             }
           )
         , ( "help"
@@ -159,6 +305,7 @@ init _ =
     ( { prompt = ""
       , history = []
       , output = []
+      , pwd = "/"
       }
     , Cmd.none
     )
@@ -282,7 +429,7 @@ viewPrompt : Model -> Html Msg
 viewPrompt model =
     div [ class "shell-line" ]
         [ div [ class "shell-line-prompt" ] [ viewText (Styled prompt [ Color "#606060" ]) ]
-        , textarea [ id "shell-line-input", autofocus True, value model.prompt, onInput UpdatePrompt, onEnter Submit ] []
+        , textarea [ id "shell-line-input", autofocus True, value model.prompt, onInput UpdatePrompt, onEnterSubmit ] []
         ]
 
 
@@ -319,21 +466,21 @@ viewOutput model =
                             div [] (ts |> List.map viewText)
 
                         Image u ->
-                            img [ src u, alt "Cat!" ] [ text u ]
+                            img [ src u ] [ text u ]
                 )
         )
 
 
-onEnter : msg -> Attribute msg
-onEnter msg =
-    preventDefaultOn "keydown"
+onEnterSubmit : Attribute Msg
+onEnterSubmit =
+    preventDefaultOn "keydown" <|
         (Decode.field "key" Decode.string
-            |> Decode.andThen
+            |> Decode.map
                 (\key ->
                     if key == "Enter" then
-                        Decode.succeed ( msg, True )
+                        ( Submit, True )
 
                     else
-                        Decode.fail "Not Enter"
+                        ( NoOp, False )
                 )
         )
