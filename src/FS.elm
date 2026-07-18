@@ -1,10 +1,10 @@
 module FS exposing (Node(..), child, isDirectory, isFile, list, name, normalizePath, resolvePath, tree)
 
-import RichText exposing (Text)
+import RichText exposing (RichText)
 
 
 type Node
-    = File String (List (List Text))
+    = File String RichText
     | Directory String (List Node)
 
 
@@ -81,17 +81,17 @@ resolvePath path root =
     normalizePath path |> List.foldl (\p acc -> acc |> Maybe.andThen (child p)) (Just root)
 
 
-list : Node -> List Text
+list : Node -> RichText
 list root =
     case root of
         File name_ _ ->
-            [ RichText.Plain name_ ]
+            RichText.Plain name_
 
         Directory _ children ->
-            children |> List.sortBy name |> List.map name |> List.map RichText.Plain |> List.intersperse (RichText.Plain "  ")
+            children |> List.sortBy name |> List.map name |> List.map RichText.Plain |> List.intersperse (RichText.Plain "  ") |> RichText.Group |> RichText.Line
 
 
-tree : Node -> List Text
+tree : Node -> RichText
 tree root =
     let
         aux node depth ancestors isLast =
@@ -119,7 +119,7 @@ tree root =
                         "├── "
 
                 line =
-                    RichText.Plain (prefix ++ branch ++ name node)
+                    RichText.Line (RichText.Plain (prefix ++ branch ++ name node))
 
                 childAncestors =
                     if depth == 0 then
@@ -145,4 +145,4 @@ tree root =
             in
             line :: childLines
     in
-    aux root 0 [] False
+    RichText.Group (aux root 0 [] False)

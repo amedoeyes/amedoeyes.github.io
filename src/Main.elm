@@ -5,12 +5,12 @@ import Browser.Dom as Dom
 import Browser.Events exposing (onKeyPress)
 import Dict exposing (Dict)
 import FS
-import Html exposing (Attribute, Html, div, img, main_, span, text, textarea)
-import Html.Attributes exposing (autofocus, class, id, src, style, value)
+import Html exposing (Attribute, Html, div, img, main_, text, textarea)
+import Html.Attributes exposing (autofocus, class, id, src, value)
 import Html.Events exposing (onInput, preventDefaultOn)
 import Http
 import Json.Decode as Decode
-import RichText exposing (..)
+import RichText
 import Task
 
 
@@ -25,16 +25,16 @@ main =
 
 
 type Msg
-    = UpdatePrompt String
+    = UpdateInput String
     | Submit
     | GotImage (Result Http.Error String)
     | ScrollDone (Result Dom.Error ())
-    | FocusPrompt
+    | FocusInput
     | NoOp
 
 
 type alias Model =
-    { prompt : String
+    { input : String
     , history : List String
     , output : List Output
     , pwd : String
@@ -42,7 +42,7 @@ type alias Model =
 
 
 type Output
-    = Text (List Text)
+    = Text RichText.RichText
     | Image String
 
 
@@ -56,23 +56,23 @@ type alias Command =
     }
 
 
-prompt : String
+prompt : RichText.RichText
 prompt =
-    "$ "
+    RichText.Styled [ RichText.Color "#606060" ] (RichText.Plain "$ ")
 
 
 fileSystem : FS.Node
 fileSystem =
     FS.Directory ""
-        [ FS.File "hello.txt" [ [ Plain "Hello world!" ] ]
-        , FS.File "hello_lines.txt" [ [ Plain "Hello" ], [ Plain "world!" ] ]
-        , FS.File "file1.txt" [ [ Plain "file 1" ] ]
-        , FS.File "file2.txt" [ [ Plain "file 2" ] ]
+        [ FS.File "hello.txt" (RichText.Line (RichText.Plain "Hello world!"))
+        , FS.File "hello_lines.txt" (RichText.Group [ RichText.Line (RichText.Plain "Hello"), RichText.Line (RichText.Plain "world!") ])
+        , FS.File "file1.txt" (RichText.Line (RichText.Plain "file 1"))
+        , FS.File "file2.txt" (RichText.Line (RichText.Plain "file 2"))
         , FS.Directory "dir"
-            [ FS.File "file1.txt" [ [ Plain "file 1" ] ]
-            , FS.File "file2.txt" [ [ Plain "file 2" ] ]
+            [ FS.File "file1.txt" (RichText.Line (RichText.Plain "file 1"))
+            , FS.File "file2.txt" (RichText.Line (RichText.Plain "file 2"))
             , FS.Directory "subdir"
-                [ FS.File "file1.txt" [ [ Plain "file 1" ] ]
+                [ FS.File "file1.txt" (RichText.Line (RichText.Plain "file 1"))
                 ]
             ]
         ]
@@ -89,9 +89,13 @@ commands =
             , maxArgs = Nothing
             , run =
                 \args model ->
-                    ( { model | output = model.output ++ [ Text (args |> List.map (\a -> Plain a)) ] }
-                    , Cmd.none
-                    )
+                    let
+                        output =
+                            Text (args |> List.map (\a -> RichText.Plain a) |> List.intersperse (RichText.Plain " ") |> RichText.Group |> RichText.Line)
+                                |> List.singleton
+                                |> List.append model.output
+                    in
+                    ( { model | output = output }, Cmd.none )
             }
           )
         , ( "clear"
@@ -113,9 +117,11 @@ commands =
                 \_ model ->
                     let
                         output =
-                            [ Text [ Plain model.pwd ] ]
+                            Text (RichText.Line (RichText.Plain model.pwd))
+                                |> List.singleton
+                                |> List.append model.output
                     in
-                    ( { model | output = model.output ++ output }, Cmd.none )
+                    ( { model | output = output }, Cmd.none )
             }
           )
         , ( "cd"
@@ -143,12 +149,20 @@ commands =
                                     in
                                     case FS.resolvePath newPath fileSystem of
                                         Nothing ->
-                                            ( model.pwd, model.output ++ [ Text [ Plain ("Error: '" ++ path ++ "' no such file or directory") ] ] )
+                                            ( model.pwd
+                                            , Text (RichText.Line (RichText.Plain ([ "Error: the directory", "'" ++ path ++ "'", "does not exist" ] |> String.join " ")))
+                                                |> List.singleton
+                                                |> List.append model.output
+                                            )
 
                                         Just node ->
                                             case node of
                                                 FS.File _ _ ->
-                                                    ( model.pwd, model.output ++ [ Text [ Plain ("Error: '" ++ path ++ "' is not a directory") ] ] )
+                                                    ( model.pwd
+                                                    , Text (RichText.Line (RichText.Plain ([ "Error:", "'" ++ path ++ "'", "is not a directory" ] |> String.join " ")))
+                                                        |> List.singleton
+                                                        |> List.append model.output
+                                                    )
 
                                                 FS.Directory _ _ ->
                                                     ( "/" ++ (FS.normalizePath newPath |> String.join "/"), model.output )
@@ -170,20 +184,28 @@ commands =
                                 [] ->
                                     case FS.resolvePath model.pwd fileSystem of
                                         Nothing ->
-                                            [ Text [ Plain ("Error: '" ++ model.pwd ++ "' no such file or directory") ] ]
+                                            Text (RichText.Plain ([ "Error:", "'" ++ model.pwd ++ "'", "no such file or directory" ] |> String.join " "))
+                                                |> List.singleton
+                                                |> List.append model.output
 
                                         Just node ->
-                                            [ Text (FS.list node) ]
+                                            Text (FS.list node)
+                                                |> List.singleton
+                                                |> List.append model.output
 
                                 path :: _ ->
                                     case FS.resolvePath (model.pwd ++ "/" ++ path) fileSystem of
                                         Nothing ->
-                                            [ Text [ Plain ("Error: '" ++ path ++ "' no such file or directory") ] ]
+                                            Text (RichText.Plain ([ "Error:", "'" ++ model.pwd ++ "'", "no such file or directory" ] |> String.join " "))
+                                                |> List.singleton
+                                                |> List.append model.output
 
                                         Just node ->
-                                            [ Text (FS.list node) ]
+                                            Text (FS.list node)
+                                                |> List.singleton
+                                                |> List.append model.output
                     in
-                    ( { model | output = model.output ++ output }, Cmd.none )
+                    ( { model | output = output }, Cmd.none )
             }
           )
         , ( "tree"
@@ -200,20 +222,37 @@ commands =
                                 [] ->
                                     case FS.resolvePath model.pwd fileSystem of
                                         Nothing ->
-                                            [ Text [ Plain ("Error: '" ++ model.pwd ++ "' no such file or directory") ] ]
+                                            Text (RichText.Line (RichText.Plain ([ "Error: the directory", "'" ++ model.pwd ++ "'", "does not exist" ] |> String.join " ")))
+                                                |> List.singleton
+                                                |> List.append model.output
 
                                         Just node ->
-                                            FS.tree node |> List.map (List.singleton >> Text)
+                                            FS.tree node
+                                                |> Text
+                                                |> List.singleton
+                                                |> List.append model.output
 
                                 path :: _ ->
                                     case FS.resolvePath (model.pwd ++ "/" ++ path) fileSystem of
                                         Nothing ->
-                                            [ Text [ Plain ("Error: '" ++ path ++ "' no such file or directory") ] ]
+                                            Text (RichText.Line (RichText.Plain ([ "Error: the directory", "'" ++ path ++ "'", "does not exist" ] |> String.join " ")))
+                                                |> List.singleton
+                                                |> List.append model.output
 
                                         Just node ->
-                                            FS.tree node |> List.map (List.singleton >> Text)
+                                            case node of
+                                                FS.File _ _ ->
+                                                    Text (RichText.Line (RichText.Plain ([ "Error:", "'" ++ path ++ "'", "is not a directory" ] |> String.join " ")))
+                                                        |> List.singleton
+                                                        |> List.append model.output
+
+                                                FS.Directory _ _ ->
+                                                    FS.tree node
+                                                        |> Text
+                                                        |> List.singleton
+                                                        |> List.append model.output
                     in
-                    ( { model | output = model.output ++ output }, Cmd.none )
+                    ( { model | output = output }, Cmd.none )
             }
           )
         , ( "cat"
@@ -227,19 +266,19 @@ commands =
                     let
                         output =
                             args
-                                |> List.concatMap
+                                |> List.map
                                     (\path ->
                                         case FS.resolvePath (model.pwd ++ "/" ++ path) fileSystem of
                                             Nothing ->
-                                                [ Text [ Plain ("Error: '" ++ path ++ "' no such file or directory") ] ]
+                                                Text (RichText.Line (RichText.Plain ([ "Error: file", "'" ++ path ++ "'", "does not exist" ] |> String.join " ")))
 
                                             Just node ->
                                                 case node of
                                                     FS.File _ content ->
-                                                        content |> List.map Text
+                                                        content |> Text
 
                                                     FS.Directory _ _ ->
-                                                        [ Text [ Plain ("Error: '" ++ path ++ "' is a directory") ] ]
+                                                        Text (RichText.Line (RichText.Plain ([ "Error:", "'" ++ path ++ "'", "is a directory" ] |> String.join " ")))
                                     )
                                 |> List.append model.output
                     in
@@ -263,38 +302,46 @@ commands =
             , maxArgs = Just 1
             , run =
                 \args model ->
-                    ( { model
-                        | output =
-                            model.output
-                                ++ (case args of
-                                        [] ->
-                                            let
-                                                values =
-                                                    commands |> Dict.values |> List.sortBy (\cmd -> cmd.name)
+                    let
+                        output =
+                            case args of
+                                [] ->
+                                    let
+                                        values =
+                                            commands |> Dict.values |> List.sortBy (\cmd -> cmd.name)
 
-                                                maxLen =
-                                                    values |> List.map (\cmd -> String.length cmd.name + String.length cmd.arguments + 1) |> List.maximum |> Maybe.withDefault 0
-                                            in
-                                            values
-                                                |> List.map
-                                                    (\cmd ->
-                                                        Text
-                                                            [ Styled ([ cmd.name, cmd.arguments ] |> String.join " ") [ Bold ]
-                                                            , Plain (String.repeat (maxLen - (String.length cmd.name + String.length cmd.arguments + 1)) " " ++ "  " ++ cmd.description)
+                                        maxLen =
+                                            values |> List.map (\cmd -> String.length cmd.name + String.length cmd.arguments + 1) |> List.maximum |> Maybe.withDefault 0
+                                    in
+                                    values
+                                        |> List.map
+                                            (\cmd ->
+                                                Text
+                                                    (RichText.Line
+                                                        (RichText.Group
+                                                            [ RichText.Styled [ RichText.Bold ] (RichText.Plain ([ cmd.name, cmd.arguments ] |> String.join " "))
+                                                            , RichText.Plain (String.repeat (maxLen - (String.length cmd.name + String.length cmd.arguments + 1)) " " ++ "  " ++ cmd.description)
                                                             ]
+                                                        )
                                                     )
+                                            )
+                                        |> List.append model.output
 
-                                        name :: _ ->
-                                            case Dict.get name commands of
-                                                Just cmd ->
-                                                    [ Text [ Plain cmd.description ], Text [], Text [ Plain ([ "Usage:", cmd.name, cmd.arguments ] |> String.join " ") ] ]
+                                name :: _ ->
+                                    case Dict.get name commands of
+                                        Just cmd ->
+                                            [ Text (RichText.Line (RichText.Plain cmd.description))
+                                            , Text (RichText.Line (RichText.Plain ""))
+                                            , Text (RichText.Line (RichText.Plain ([ "Usage:", cmd.name, cmd.arguments ] |> String.join " ")))
+                                            ]
+                                                |> List.append model.output
 
-                                                Nothing ->
-                                                    [ Text [ Plain ([ "Error:", "'" ++ name ++ "'", "does not exist" ] |> String.join " ") ] ]
-                                   )
-                      }
-                    , Cmd.none
-                    )
+                                        Nothing ->
+                                            Text (RichText.Line (RichText.Plain ([ "Error:", "'" ++ name ++ "'", "does not exist" ] |> String.join " ")))
+                                                |> List.singleton
+                                                |> List.append model.output
+                    in
+                    ( { model | output = output }, Cmd.none )
             }
           )
         ]
@@ -302,7 +349,7 @@ commands =
 
 init : a -> ( Model, Cmd msg )
 init _ =
-    ( { prompt = ""
+    ( { input = ""
       , history = []
       , output = []
       , pwd = "/"
@@ -325,7 +372,7 @@ onKeyPressFocus =
                     NoOp
 
                 else
-                    FocusPrompt
+                    FocusInput
             )
             (Decode.field "ctrlKey" Decode.bool)
             (Decode.field "metaKey" Decode.bool)
@@ -334,28 +381,22 @@ onKeyPressFocus =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UpdatePrompt newPrompt ->
-            ( { model | prompt = newPrompt }
+        UpdateInput newInput ->
+            ( { model | input = newInput }
             , Cmd.none
             )
 
         Submit ->
-            let
-                ( newModel, newCmd ) =
-                    processCmd
-                        { model
-                            | history = model.history ++ [ model.prompt ]
-                            , output = model.output ++ [ Text [ Styled prompt [ Color "#606060" ], Plain model.prompt ] ]
-                            , prompt = ""
-                        }
-                        (String.words model.prompt)
-            in
-            ( newModel
-            , Cmd.batch
-                [ newCmd, scrollToBottom ]
-            )
+            processCmd
+                { model
+                    | history = model.history ++ [ model.input ]
+                    , output = model.output ++ [ Text (RichText.Line (RichText.Group [ prompt, RichText.Plain model.input ])) ]
+                    , input = ""
+                }
+                (String.words model.input)
+                |> (\( m, c ) -> ( m, Cmd.batch [ c, scrollToBottom ] ))
 
-        FocusPrompt ->
+        FocusInput ->
             ( model, Dom.focus "shell-line-input" |> Task.attempt (always NoOp) )
 
         GotImage res ->
@@ -389,17 +430,13 @@ processCmd model argv =
                             List.length args
                     in
                     if argCount < cmd.minArgs then
-                        ( { model | output = model.output ++ [ Text [ Plain ("Error: " ++ name ++ " requires at least " ++ String.fromInt cmd.minArgs ++ " argument(s)") ] ] }
-                        , Cmd.none
-                        )
+                        ( { model | output = model.output ++ [ Text (RichText.Line (RichText.Plain ([ "Error:", "'" ++ name ++ "'", "requires at least", String.fromInt cmd.minArgs, "argument(s)" ] |> String.join " "))) ] }, Cmd.none )
 
                     else
                         case cmd.maxArgs of
                             Just max ->
                                 if argCount > max then
-                                    ( { model | output = model.output ++ [ Text [ Plain ("Error: " ++ name ++ " accepts at most " ++ String.fromInt max ++ " argument(s)") ] ] }
-                                    , Cmd.none
-                                    )
+                                    ( { model | output = model.output ++ [ Text (RichText.Line (RichText.Plain ([ "Error:", "'" ++ name ++ "'", "requires at most", String.fromInt cmd.minArgs, "argument(s)" ] |> String.join " "))) ] }, Cmd.none )
 
                                 else
                                     cmd.run args model
@@ -412,63 +449,39 @@ processCmd model argv =
                         ( model, Cmd.none )
 
                     else
-                        ( { model | output = model.output ++ [ Text [ Plain ("Unknown command: " ++ name) ] ] }
-                        , Cmd.none
-                        )
+                        ( { model | output = model.output ++ [ Text (RichText.Line (RichText.Plain ("Unknown command: " ++ name))) ] }, Cmd.none )
 
 
 view : Model -> Html Msg
 view model =
     main_ []
         [ viewOutput model
-        , viewPrompt model
+        , viewInput model
         ]
-
-
-viewPrompt : Model -> Html Msg
-viewPrompt model =
-    div [ class "shell-line" ]
-        [ div [ class "shell-line-prompt" ] [ viewText (Styled prompt [ Color "#606060" ]) ]
-        , textarea [ id "shell-line-input", autofocus True, value model.prompt, onInput UpdatePrompt, onEnterSubmit ] []
-        ]
-
-
-viewText : Text -> Html Msg
-viewText txt =
-    case txt of
-        Plain str ->
-            text str
-
-        Styled str styles ->
-            span
-                (styles
-                    |> List.map
-                        (\s ->
-                            case s of
-                                Color c ->
-                                    style "color" c
-
-                                Bold ->
-                                    style "font-weight" "bold"
-                        )
-                )
-                [ text str ]
 
 
 viewOutput : Model -> Html Msg
 viewOutput model =
     div [ class "output" ]
         (model.output
-            |> List.map
+            |> List.concatMap
                 (\o ->
                     case o of
-                        Text ts ->
-                            div [] (ts |> List.map viewText)
+                        Text rt ->
+                            RichText.view rt
 
                         Image u ->
-                            img [ src u ] [ text u ]
+                            [ img [ src u ] [ text u ] ]
                 )
         )
+
+
+viewInput : Model -> Html Msg
+viewInput model =
+    div [ class "shell-line" ]
+        [ div [ class "shell-line-prompt" ] (RichText.view prompt)
+        , textarea [ id "shell-line-input", autofocus True, value model.input, onInput UpdateInput, onEnterSubmit ] []
+        ]
 
 
 onEnterSubmit : Attribute Msg

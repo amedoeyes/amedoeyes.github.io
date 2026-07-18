@@ -5383,11 +5383,11 @@ var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{history: _List_Nil, output: _List_Nil, prompt: '', pwd: '/'},
+		{history: _List_Nil, input: '', output: _List_Nil, pwd: '/'},
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $author$project$Main$FocusPrompt = {$: 'FocusPrompt'};
+var $author$project$Main$FocusInput = {$: 'FocusInput'};
 var $author$project$Main$NoOp = {$: 'NoOp'};
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$json$Json$Decode$field = _Json_decodeField;
@@ -5797,7 +5797,7 @@ var $author$project$Main$onKeyPressFocus = $elm$browser$Browser$Events$onKeyPres
 		$elm$json$Json$Decode$map2,
 		F2(
 			function (ctrl, meta) {
-				return (ctrl || meta) ? $author$project$Main$NoOp : $author$project$Main$FocusPrompt;
+				return (ctrl || meta) ? $author$project$Main$NoOp : $author$project$Main$FocusInput;
 			}),
 		A2($elm$json$Json$Decode$field, 'ctrlKey', $elm$json$Json$Decode$bool),
 		A2($elm$json$Json$Decode$field, 'metaKey', $elm$json$Json$Decode$bool)));
@@ -5806,19 +5806,18 @@ var $author$project$Main$subscriptions = function (_v0) {
 		_List_fromArray(
 			[$author$project$Main$onKeyPressFocus]));
 };
-var $author$project$RichText$Color = function (a) {
-	return {$: 'Color', a: a};
+var $author$project$RichText$Group = function (a) {
+	return {$: 'Group', a: a};
 };
 var $author$project$Main$Image = function (a) {
 	return {$: 'Image', a: a};
 };
+var $author$project$RichText$Line = function (a) {
+	return {$: 'Line', a: a};
+};
 var $author$project$RichText$Plain = function (a) {
 	return {$: 'Plain', a: a};
 };
-var $author$project$RichText$Styled = F2(
-	function (a, b) {
-		return {$: 'Styled', a: a, b: b};
-	});
 var $author$project$Main$Text = function (a) {
 	return {$: 'Text', a: a};
 };
@@ -5866,6 +5865,10 @@ var $author$project$RichText$Bold = {$: 'Bold'};
 var $author$project$Main$GotImage = function (a) {
 	return {$: 'GotImage', a: a};
 };
+var $author$project$RichText$Styled = F2(
+	function (a, b) {
+		return {$: 'Styled', a: a, b: b};
+	});
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5873,19 +5876,6 @@ var $elm$core$List$append = F2(
 		} else {
 			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
-	});
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
 	});
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $elm$http$Http$BadStatus_ = F2(
@@ -6318,6 +6308,11 @@ var $elm$core$Dict$update = F3(
 			return A2($elm$core$Dict$remove, targetKey, dictionary);
 		}
 	});
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
 var $elm$http$Http$expectStringResponse = F2(
 	function (toMsg, toResult) {
 		return A3(
@@ -6400,47 +6395,29 @@ var $author$project$Main$fileSystem = A2(
 			A2(
 			$author$project$FS$File,
 			'hello.txt',
-			_List_fromArray(
-				[
-					_List_fromArray(
-					[
-						$author$project$RichText$Plain('Hello world!')
-					])
-				])),
+			$author$project$RichText$Line(
+				$author$project$RichText$Plain('Hello world!'))),
 			A2(
 			$author$project$FS$File,
 			'hello_lines.txt',
-			_List_fromArray(
-				[
-					_List_fromArray(
+			$author$project$RichText$Group(
+				_List_fromArray(
 					[
-						$author$project$RichText$Plain('Hello')
-					]),
-					_List_fromArray(
-					[
-						$author$project$RichText$Plain('world!')
-					])
-				])),
+						$author$project$RichText$Line(
+						$author$project$RichText$Plain('Hello')),
+						$author$project$RichText$Line(
+						$author$project$RichText$Plain('world!'))
+					]))),
 			A2(
 			$author$project$FS$File,
 			'file1.txt',
-			_List_fromArray(
-				[
-					_List_fromArray(
-					[
-						$author$project$RichText$Plain('file 1')
-					])
-				])),
+			$author$project$RichText$Line(
+				$author$project$RichText$Plain('file 1'))),
 			A2(
 			$author$project$FS$File,
 			'file2.txt',
-			_List_fromArray(
-				[
-					_List_fromArray(
-					[
-						$author$project$RichText$Plain('file 2')
-					])
-				])),
+			$author$project$RichText$Line(
+				$author$project$RichText$Plain('file 2'))),
 			A2(
 			$author$project$FS$Directory,
 			'dir',
@@ -6449,23 +6426,13 @@ var $author$project$Main$fileSystem = A2(
 					A2(
 					$author$project$FS$File,
 					'file1.txt',
-					_List_fromArray(
-						[
-							_List_fromArray(
-							[
-								$author$project$RichText$Plain('file 1')
-							])
-						])),
+					$author$project$RichText$Line(
+						$author$project$RichText$Plain('file 1'))),
 					A2(
 					$author$project$FS$File,
 					'file2.txt',
-					_List_fromArray(
-						[
-							_List_fromArray(
-							[
-								$author$project$RichText$Plain('file 2')
-							])
-						])),
+					$author$project$RichText$Line(
+						$author$project$RichText$Plain('file 2'))),
 					A2(
 					$author$project$FS$Directory,
 					'subdir',
@@ -6474,13 +6441,8 @@ var $author$project$Main$fileSystem = A2(
 							A2(
 							$author$project$FS$File,
 							'file1.txt',
-							_List_fromArray(
-								[
-									_List_fromArray(
-									[
-										$author$project$RichText$Plain('file 1')
-									])
-								]))
+							$author$project$RichText$Line(
+								$author$project$RichText$Plain('file 1')))
 						]))
 				]))
 		]));
@@ -6639,13 +6601,6 @@ var $elm$http$Http$get = function (r) {
 		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
 var $elm$json$Json$Decode$index = _Json_decodeIndex;
-var $elm$core$List$isEmpty = function (xs) {
-	if (!xs.b) {
-		return true;
-	} else {
-		return false;
-	}
-};
 var $elm$core$List$intersperse = F2(
 	function (sep, xs) {
 		if (!xs.b) {
@@ -6664,6 +6619,13 @@ var $elm$core$List$intersperse = F2(
 			return A2($elm$core$List$cons, hd, spersed);
 		}
 	});
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
 var $author$project$FS$name = function (node) {
 	if (node.$ === 'File') {
 		var name_ = node.a;
@@ -6677,22 +6639,21 @@ var $elm$core$List$sortBy = _List_sortBy;
 var $author$project$FS$list = function (root) {
 	if (root.$ === 'File') {
 		var name_ = root.a;
-		return _List_fromArray(
-			[
-				$author$project$RichText$Plain(name_)
-			]);
+		return $author$project$RichText$Plain(name_);
 	} else {
 		var children = root.b;
-		return A2(
-			$elm$core$List$intersperse,
-			$author$project$RichText$Plain('  '),
-			A2(
-				$elm$core$List$map,
-				$author$project$RichText$Plain,
+		return $author$project$RichText$Line(
+			$author$project$RichText$Group(
 				A2(
-					$elm$core$List$map,
-					$author$project$FS$name,
-					A2($elm$core$List$sortBy, $author$project$FS$name, children))));
+					$elm$core$List$intersperse,
+					$author$project$RichText$Plain('  '),
+					A2(
+						$elm$core$List$map,
+						$author$project$RichText$Plain,
+						A2(
+							$elm$core$List$map,
+							$author$project$FS$name,
+							A2($elm$core$List$sortBy, $author$project$FS$name, children))))));
 	}
 };
 var $elm$core$List$maximum = function (list) {
@@ -6830,6 +6791,9 @@ var $elm$core$List$singleton = function (value) {
 		[value]);
 };
 var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
 var $elm$core$String$concat = function (strings) {
 	return A2($elm$core$String$join, '', strings);
 };
@@ -6869,15 +6833,17 @@ var $author$project$FS$tree = function (root) {
 				}
 			}();
 			var branch = (!depth) ? '' : (isLast ? '└── ' : '├── ');
-			var line = $author$project$RichText$Plain(
-				_Utils_ap(
-					prefix,
+			var line = $author$project$RichText$Line(
+				$author$project$RichText$Plain(
 					_Utils_ap(
-						branch,
-						$author$project$FS$name(node))));
+						prefix,
+						_Utils_ap(
+							branch,
+							$author$project$FS$name(node)))));
 			return A2($elm$core$List$cons, line, childLines);
 		});
-	return A4(aux, root, 0, _List_Nil, false);
+	return $author$project$RichText$Group(
+		A4(aux, root, 0, _List_Nil, false));
 };
 var $elm$core$Dict$values = function (dict) {
 	return A3(
@@ -6912,23 +6878,26 @@ function $author$project$Main$cyclic$commands() {
 					name: 'echo',
 					run: F2(
 						function (args, model) {
-							return _Utils_Tuple2(
-								_Utils_update(
-									model,
-									{
-										output: _Utils_ap(
-											model.output,
-											_List_fromArray(
-												[
-													$author$project$Main$Text(
+							var output = A2(
+								$elm$core$List$append,
+								model.output,
+								$elm$core$List$singleton(
+									$author$project$Main$Text(
+										$author$project$RichText$Line(
+											$author$project$RichText$Group(
+												A2(
+													$elm$core$List$intersperse,
+													$author$project$RichText$Plain(' '),
 													A2(
 														$elm$core$List$map,
 														function (a) {
 															return $author$project$RichText$Plain(a);
 														},
-														args))
-												]))
-									}),
+														args)))))));
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{output: output}),
 								$elm$core$Platform$Cmd$none);
 						})
 				}),
@@ -6959,20 +6928,17 @@ function $author$project$Main$cyclic$commands() {
 					name: 'pwd',
 					run: F2(
 						function (_v1, model) {
-							var output = _List_fromArray(
-								[
+							var output = A2(
+								$elm$core$List$append,
+								model.output,
+								$elm$core$List$singleton(
 									$author$project$Main$Text(
-									_List_fromArray(
-										[
-											$author$project$RichText$Plain(model.pwd)
-										]))
-								]);
+										$author$project$RichText$Line(
+											$author$project$RichText$Plain(model.pwd)))));
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
-									{
-										output: _Utils_ap(model.output, output)
-									}),
+									{output: output}),
 								$elm$core$Platform$Cmd$none);
 						})
 				}),
@@ -6996,31 +6962,35 @@ function $author$project$Main$cyclic$commands() {
 									if (_v4.$ === 'Nothing') {
 										return _Utils_Tuple2(
 											model.pwd,
-											_Utils_ap(
+											A2(
+												$elm$core$List$append,
 												model.output,
-												_List_fromArray(
-													[
-														$author$project$Main$Text(
-														_List_fromArray(
-															[
-																$author$project$RichText$Plain('Error: \'' + (path + '\' no such file or directory'))
-															]))
-													])));
+												$elm$core$List$singleton(
+													$author$project$Main$Text(
+														$author$project$RichText$Line(
+															$author$project$RichText$Plain(
+																A2(
+																	$elm$core$String$join,
+																	' ',
+																	_List_fromArray(
+																		['Error: the directory', '\'' + (path + '\''), 'does not exist']))))))));
 									} else {
 										var node = _v4.a;
 										if (node.$ === 'File') {
 											return _Utils_Tuple2(
 												model.pwd,
-												_Utils_ap(
+												A2(
+													$elm$core$List$append,
 													model.output,
-													_List_fromArray(
-														[
-															$author$project$Main$Text(
-															_List_fromArray(
-																[
-																	$author$project$RichText$Plain('Error: \'' + (path + '\' is not a directory'))
-																]))
-														])));
+													$elm$core$List$singleton(
+														$author$project$Main$Text(
+															$author$project$RichText$Line(
+																$author$project$RichText$Plain(
+																	A2(
+																		$elm$core$String$join,
+																		' ',
+																		_List_fromArray(
+																			['Error:', '\'' + (path + '\''), 'is not a directory']))))))));
 										} else {
 											return _Utils_Tuple2(
 												'/' + A2(
@@ -7055,50 +7025,56 @@ function $author$project$Main$cyclic$commands() {
 								if (!args.b) {
 									var _v7 = A2($author$project$FS$resolvePath, model.pwd, $author$project$Main$fileSystem);
 									if (_v7.$ === 'Nothing') {
-										return _List_fromArray(
-											[
+										return A2(
+											$elm$core$List$append,
+											model.output,
+											$elm$core$List$singleton(
 												$author$project$Main$Text(
-												_List_fromArray(
-													[
-														$author$project$RichText$Plain('Error: \'' + (model.pwd + '\' no such file or directory'))
-													]))
-											]);
+													$author$project$RichText$Plain(
+														A2(
+															$elm$core$String$join,
+															' ',
+															_List_fromArray(
+																['Error:', '\'' + (model.pwd + '\''), 'no such file or directory']))))));
 									} else {
 										var node = _v7.a;
-										return _List_fromArray(
-											[
+										return A2(
+											$elm$core$List$append,
+											model.output,
+											$elm$core$List$singleton(
 												$author$project$Main$Text(
-												$author$project$FS$list(node))
-											]);
+													$author$project$FS$list(node))));
 									}
 								} else {
 									var path = args.a;
 									var _v8 = A2($author$project$FS$resolvePath, model.pwd + ('/' + path), $author$project$Main$fileSystem);
 									if (_v8.$ === 'Nothing') {
-										return _List_fromArray(
-											[
+										return A2(
+											$elm$core$List$append,
+											model.output,
+											$elm$core$List$singleton(
 												$author$project$Main$Text(
-												_List_fromArray(
-													[
-														$author$project$RichText$Plain('Error: \'' + (path + '\' no such file or directory'))
-													]))
-											]);
+													$author$project$RichText$Plain(
+														A2(
+															$elm$core$String$join,
+															' ',
+															_List_fromArray(
+																['Error:', '\'' + (model.pwd + '\''), 'no such file or directory']))))));
 									} else {
 										var node = _v8.a;
-										return _List_fromArray(
-											[
+										return A2(
+											$elm$core$List$append,
+											model.output,
+											$elm$core$List$singleton(
 												$author$project$Main$Text(
-												$author$project$FS$list(node))
-											]);
+													$author$project$FS$list(node))));
 									}
 								}
 							}();
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
-									{
-										output: _Utils_ap(model.output, output)
-									}),
+									{output: output}),
 								$elm$core$Platform$Cmd$none);
 						})
 				}),
@@ -7116,48 +7092,73 @@ function $author$project$Main$cyclic$commands() {
 								if (!args.b) {
 									var _v10 = A2($author$project$FS$resolvePath, model.pwd, $author$project$Main$fileSystem);
 									if (_v10.$ === 'Nothing') {
-										return _List_fromArray(
-											[
+										return A2(
+											$elm$core$List$append,
+											model.output,
+											$elm$core$List$singleton(
 												$author$project$Main$Text(
-												_List_fromArray(
-													[
-														$author$project$RichText$Plain('Error: \'' + (model.pwd + '\' no such file or directory'))
-													]))
-											]);
+													$author$project$RichText$Line(
+														$author$project$RichText$Plain(
+															A2(
+																$elm$core$String$join,
+																' ',
+																_List_fromArray(
+																	['Error: the directory', '\'' + (model.pwd + '\''), 'does not exist'])))))));
 									} else {
 										var node = _v10.a;
 										return A2(
-											$elm$core$List$map,
-											A2($elm$core$Basics$composeR, $elm$core$List$singleton, $author$project$Main$Text),
-											$author$project$FS$tree(node));
+											$elm$core$List$append,
+											model.output,
+											$elm$core$List$singleton(
+												$author$project$Main$Text(
+													$author$project$FS$tree(node))));
 									}
 								} else {
 									var path = args.a;
 									var _v11 = A2($author$project$FS$resolvePath, model.pwd + ('/' + path), $author$project$Main$fileSystem);
 									if (_v11.$ === 'Nothing') {
-										return _List_fromArray(
-											[
+										return A2(
+											$elm$core$List$append,
+											model.output,
+											$elm$core$List$singleton(
 												$author$project$Main$Text(
-												_List_fromArray(
-													[
-														$author$project$RichText$Plain('Error: \'' + (path + '\' no such file or directory'))
-													]))
-											]);
+													$author$project$RichText$Line(
+														$author$project$RichText$Plain(
+															A2(
+																$elm$core$String$join,
+																' ',
+																_List_fromArray(
+																	['Error: the directory', '\'' + (path + '\''), 'does not exist'])))))));
 									} else {
 										var node = _v11.a;
-										return A2(
-											$elm$core$List$map,
-											A2($elm$core$Basics$composeR, $elm$core$List$singleton, $author$project$Main$Text),
-											$author$project$FS$tree(node));
+										if (node.$ === 'File') {
+											return A2(
+												$elm$core$List$append,
+												model.output,
+												$elm$core$List$singleton(
+													$author$project$Main$Text(
+														$author$project$RichText$Line(
+															$author$project$RichText$Plain(
+																A2(
+																	$elm$core$String$join,
+																	' ',
+																	_List_fromArray(
+																		['Error:', '\'' + (path + '\''), 'is not a directory'])))))));
+										} else {
+											return A2(
+												$elm$core$List$append,
+												model.output,
+												$elm$core$List$singleton(
+													$author$project$Main$Text(
+														$author$project$FS$tree(node))));
+										}
 									}
 								}
 							}();
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
-									{
-										output: _Utils_ap(model.output, output)
-									}),
+									{output: output}),
 								$elm$core$Platform$Cmd$none);
 						})
 				}),
@@ -7175,32 +7176,32 @@ function $author$project$Main$cyclic$commands() {
 								$elm$core$List$append,
 								model.output,
 								A2(
-									$elm$core$List$concatMap,
+									$elm$core$List$map,
 									function (path) {
-										var _v12 = A2($author$project$FS$resolvePath, model.pwd + ('/' + path), $author$project$Main$fileSystem);
-										if (_v12.$ === 'Nothing') {
-											return _List_fromArray(
-												[
-													$author$project$Main$Text(
-													_List_fromArray(
-														[
-															$author$project$RichText$Plain('Error: \'' + (path + '\' no such file or directory'))
-														]))
-												]);
+										var _v13 = A2($author$project$FS$resolvePath, model.pwd + ('/' + path), $author$project$Main$fileSystem);
+										if (_v13.$ === 'Nothing') {
+											return $author$project$Main$Text(
+												$author$project$RichText$Line(
+													$author$project$RichText$Plain(
+														A2(
+															$elm$core$String$join,
+															' ',
+															_List_fromArray(
+																['Error: file', '\'' + (path + '\''), 'does not exist'])))));
 										} else {
-											var node = _v12.a;
+											var node = _v13.a;
 											if (node.$ === 'File') {
 												var content = node.b;
-												return A2($elm$core$List$map, $author$project$Main$Text, content);
+												return $author$project$Main$Text(content);
 											} else {
-												return _List_fromArray(
-													[
-														$author$project$Main$Text(
-														_List_fromArray(
-															[
-																$author$project$RichText$Plain('Error: \'' + (path + '\' is a directory'))
-															]))
-													]);
+												return $author$project$Main$Text(
+													$author$project$RichText$Line(
+														$author$project$RichText$Plain(
+															A2(
+																$elm$core$String$join,
+																' ',
+																_List_fromArray(
+																	['Error:', '\'' + (path + '\''), 'is a directory'])))));
 											}
 										}
 									},
@@ -7234,99 +7235,102 @@ function $author$project$Main$cyclic$commands() {
 					name: 'help',
 					run: F2(
 						function (args, model) {
+							var output = function () {
+								if (!args.b) {
+									var values = A2(
+										$elm$core$List$sortBy,
+										function (cmd) {
+											return cmd.name;
+										},
+										$elm$core$Dict$values(
+											$author$project$Main$cyclic$commands()));
+									var maxLen = A2(
+										$elm$core$Maybe$withDefault,
+										0,
+										$elm$core$List$maximum(
+											A2(
+												$elm$core$List$map,
+												function (cmd) {
+													return ($elm$core$String$length(cmd.name) + $elm$core$String$length(cmd._arguments)) + 1;
+												},
+												values)));
+									return A2(
+										$elm$core$List$append,
+										model.output,
+										A2(
+											$elm$core$List$map,
+											function (cmd) {
+												return $author$project$Main$Text(
+													$author$project$RichText$Line(
+														$author$project$RichText$Group(
+															_List_fromArray(
+																[
+																	A2(
+																	$author$project$RichText$Styled,
+																	_List_fromArray(
+																		[$author$project$RichText$Bold]),
+																	$author$project$RichText$Plain(
+																		A2(
+																			$elm$core$String$join,
+																			' ',
+																			_List_fromArray(
+																				[cmd.name, cmd._arguments])))),
+																	$author$project$RichText$Plain(
+																	A2(
+																		$elm$core$String$repeat,
+																		maxLen - (($elm$core$String$length(cmd.name) + $elm$core$String$length(cmd._arguments)) + 1),
+																		' ') + ('  ' + cmd.description))
+																]))));
+											},
+											values));
+								} else {
+									var name = args.a;
+									var _v16 = A2(
+										$elm$core$Dict$get,
+										name,
+										$author$project$Main$cyclic$commands());
+									if (_v16.$ === 'Just') {
+										var cmd = _v16.a;
+										return A2(
+											$elm$core$List$append,
+											model.output,
+											_List_fromArray(
+												[
+													$author$project$Main$Text(
+													$author$project$RichText$Line(
+														$author$project$RichText$Plain(cmd.description))),
+													$author$project$Main$Text(
+													$author$project$RichText$Line(
+														$author$project$RichText$Plain(''))),
+													$author$project$Main$Text(
+													$author$project$RichText$Line(
+														$author$project$RichText$Plain(
+															A2(
+																$elm$core$String$join,
+																' ',
+																_List_fromArray(
+																	['Usage:', cmd.name, cmd._arguments])))))
+												]));
+									} else {
+										return A2(
+											$elm$core$List$append,
+											model.output,
+											$elm$core$List$singleton(
+												$author$project$Main$Text(
+													$author$project$RichText$Line(
+														$author$project$RichText$Plain(
+															A2(
+																$elm$core$String$join,
+																' ',
+																_List_fromArray(
+																	['Error:', '\'' + (name + '\''), 'does not exist'])))))));
+									}
+								}
+							}();
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
-									{
-										output: _Utils_ap(
-											model.output,
-											function () {
-												if (!args.b) {
-													var values = A2(
-														$elm$core$List$sortBy,
-														function (cmd) {
-															return cmd.name;
-														},
-														$elm$core$Dict$values(
-															$author$project$Main$cyclic$commands()));
-													var maxLen = A2(
-														$elm$core$Maybe$withDefault,
-														0,
-														$elm$core$List$maximum(
-															A2(
-																$elm$core$List$map,
-																function (cmd) {
-																	return ($elm$core$String$length(cmd.name) + $elm$core$String$length(cmd._arguments)) + 1;
-																},
-																values)));
-													return A2(
-														$elm$core$List$map,
-														function (cmd) {
-															return $author$project$Main$Text(
-																_List_fromArray(
-																	[
-																		A2(
-																		$author$project$RichText$Styled,
-																		A2(
-																			$elm$core$String$join,
-																			' ',
-																			_List_fromArray(
-																				[cmd.name, cmd._arguments])),
-																		_List_fromArray(
-																			[$author$project$RichText$Bold])),
-																		$author$project$RichText$Plain(
-																		A2(
-																			$elm$core$String$repeat,
-																			maxLen - (($elm$core$String$length(cmd.name) + $elm$core$String$length(cmd._arguments)) + 1),
-																			' ') + ('  ' + cmd.description))
-																	]));
-														},
-														values);
-												} else {
-													var name = args.a;
-													var _v15 = A2(
-														$elm$core$Dict$get,
-														name,
-														$author$project$Main$cyclic$commands());
-													if (_v15.$ === 'Just') {
-														var cmd = _v15.a;
-														return _List_fromArray(
-															[
-																$author$project$Main$Text(
-																_List_fromArray(
-																	[
-																		$author$project$RichText$Plain(cmd.description)
-																	])),
-																$author$project$Main$Text(_List_Nil),
-																$author$project$Main$Text(
-																_List_fromArray(
-																	[
-																		$author$project$RichText$Plain(
-																		A2(
-																			$elm$core$String$join,
-																			' ',
-																			_List_fromArray(
-																				['Usage:', cmd.name, cmd._arguments])))
-																	]))
-															]);
-													} else {
-														return _List_fromArray(
-															[
-																$author$project$Main$Text(
-																_List_fromArray(
-																	[
-																		$author$project$RichText$Plain(
-																		A2(
-																			$elm$core$String$join,
-																			' ',
-																			_List_fromArray(
-																				['Error:', '\'' + (name + '\''), 'does not exist'])))
-																	]))
-															]);
-													}
-												}
-											}())
-									}),
+									{output: output}),
 								$elm$core$Platform$Cmd$none);
 						})
 				})
@@ -7360,11 +7364,19 @@ var $author$project$Main$processCmd = F2(
 									_List_fromArray(
 										[
 											$author$project$Main$Text(
-											_List_fromArray(
-												[
-													$author$project$RichText$Plain(
-													'Error: ' + (name + (' requires at least ' + ($elm$core$String$fromInt(cmd.minArgs) + ' argument(s)'))))
-												]))
+											$author$project$RichText$Line(
+												$author$project$RichText$Plain(
+													A2(
+														$elm$core$String$join,
+														' ',
+														_List_fromArray(
+															[
+																'Error:',
+																'\'' + (name + '\''),
+																'requires at least',
+																$elm$core$String$fromInt(cmd.minArgs),
+																'argument(s)'
+															])))))
 										]))
 							}),
 						$elm$core$Platform$Cmd$none);
@@ -7381,11 +7393,19 @@ var $author$project$Main$processCmd = F2(
 										_List_fromArray(
 											[
 												$author$project$Main$Text(
-												_List_fromArray(
-													[
-														$author$project$RichText$Plain(
-														'Error: ' + (name + (' accepts at most ' + ($elm$core$String$fromInt(max) + ' argument(s)'))))
-													]))
+												$author$project$RichText$Line(
+													$author$project$RichText$Plain(
+														A2(
+															$elm$core$String$join,
+															' ',
+															_List_fromArray(
+																[
+																	'Error:',
+																	'\'' + (name + '\''),
+																	'requires at most',
+																	$elm$core$String$fromInt(cmd.minArgs),
+																	'argument(s)'
+																])))))
 											]))
 								}),
 							$elm$core$Platform$Cmd$none) : A2(cmd.run, args, model);
@@ -7403,17 +7423,24 @@ var $author$project$Main$processCmd = F2(
 								_List_fromArray(
 									[
 										$author$project$Main$Text(
-										_List_fromArray(
-											[
-												$author$project$RichText$Plain('Unknown command: ' + name)
-											]))
+										$author$project$RichText$Line(
+											$author$project$RichText$Plain('Unknown command: ' + name)))
 									]))
 						}),
 					$elm$core$Platform$Cmd$none);
 			}
 		}
 	});
-var $author$project$Main$prompt = '$ ';
+var $author$project$RichText$Color = function (a) {
+	return {$: 'Color', a: a};
+};
+var $author$project$Main$prompt = A2(
+	$author$project$RichText$Styled,
+	_List_fromArray(
+		[
+			$author$project$RichText$Color('#606060')
+		]),
+	$author$project$RichText$Plain('$ '));
 var $author$project$Main$ScrollDone = function (a) {
 	return {$: 'ScrollDone', a: a};
 };
@@ -7435,51 +7462,49 @@ var $elm$core$String$words = _String_words;
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 'UpdatePrompt':
-				var newPrompt = msg.a;
+			case 'UpdateInput':
+				var newInput = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{prompt: newPrompt}),
+						{input: newInput}),
 					$elm$core$Platform$Cmd$none);
 			case 'Submit':
-				var _v1 = A2(
-					$author$project$Main$processCmd,
-					_Utils_update(
-						model,
-						{
-							history: _Utils_ap(
-								model.history,
-								_List_fromArray(
-									[model.prompt])),
-							output: _Utils_ap(
-								model.output,
-								_List_fromArray(
-									[
-										$author$project$Main$Text(
-										_List_fromArray(
-											[
-												A2(
-												$author$project$RichText$Styled,
-												$author$project$Main$prompt,
-												_List_fromArray(
-													[
-														$author$project$RichText$Color('#606060')
-													])),
-												$author$project$RichText$Plain(model.prompt)
-											]))
-									])),
-							prompt: ''
-						}),
-					$elm$core$String$words(model.prompt));
-				var newModel = _v1.a;
-				var newCmd = _v1.b;
-				return _Utils_Tuple2(
-					newModel,
-					$elm$core$Platform$Cmd$batch(
-						_List_fromArray(
-							[newCmd, $author$project$Main$scrollToBottom])));
-			case 'FocusPrompt':
+				return function (_v1) {
+					var m = _v1.a;
+					var c = _v1.b;
+					return _Utils_Tuple2(
+						m,
+						$elm$core$Platform$Cmd$batch(
+							_List_fromArray(
+								[c, $author$project$Main$scrollToBottom])));
+				}(
+					A2(
+						$author$project$Main$processCmd,
+						_Utils_update(
+							model,
+							{
+								history: _Utils_ap(
+									model.history,
+									_List_fromArray(
+										[model.input])),
+								input: '',
+								output: _Utils_ap(
+									model.output,
+									_List_fromArray(
+										[
+											$author$project$Main$Text(
+											$author$project$RichText$Line(
+												$author$project$RichText$Group(
+													_List_fromArray(
+														[
+															$author$project$Main$prompt,
+															$author$project$RichText$Plain(model.input)
+														]))))
+										]))
+							}),
+						$elm$core$String$words(model.input)));
+			case 'FocusInput':
 				return _Utils_Tuple2(
 					model,
 					A2(
@@ -7515,88 +7540,8 @@ var $author$project$Main$update = F2(
 		}
 	});
 var $elm$html$Html$main_ = _VirtualDom_node('main');
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
-var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$html$Html$img = _VirtualDom_node('img');
-var $elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$html$Html$span = _VirtualDom_node('span');
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$Main$viewText = function (txt) {
-	if (txt.$ === 'Plain') {
-		var str = txt.a;
-		return $elm$html$Html$text(str);
-	} else {
-		var str = txt.a;
-		var styles = txt.b;
-		return A2(
-			$elm$html$Html$span,
-			A2(
-				$elm$core$List$map,
-				function (s) {
-					if (s.$ === 'Color') {
-						var c = s.a;
-						return A2($elm$html$Html$Attributes$style, 'color', c);
-					} else {
-						return A2($elm$html$Html$Attributes$style, 'font-weight', 'bold');
-					}
-				},
-				styles),
-			_List_fromArray(
-				[
-					$elm$html$Html$text(str)
-				]));
-	}
-};
-var $author$project$Main$viewOutput = function (model) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('output')
-			]),
-		A2(
-			$elm$core$List$map,
-			function (o) {
-				if (o.$ === 'Text') {
-					var ts = o.a;
-					return A2(
-						$elm$html$Html$div,
-						_List_Nil,
-						A2($elm$core$List$map, $author$project$Main$viewText, ts));
-				} else {
-					var u = o.a;
-					return A2(
-						$elm$html$Html$img,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$src(u)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(u)
-							]));
-				}
-			},
-			model.output));
-};
-var $author$project$Main$UpdatePrompt = function (a) {
-	return {$: 'UpdatePrompt', a: a};
+var $author$project$Main$UpdateInput = function (a) {
+	return {$: 'UpdateInput', a: a};
 };
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
@@ -7607,6 +7552,16 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty('autofocus');
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $author$project$Main$Submit = {$: 'Submit'};
 var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
@@ -7662,7 +7617,65 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 };
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$viewPrompt = function (model) {
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$RichText$view = function (richText) {
+	switch (richText.$) {
+		case 'Plain':
+			var str = richText.a;
+			return _List_fromArray(
+				[
+					A2(
+					$elm$html$Html$span,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(str)
+						]))
+				]);
+		case 'Styled':
+			var styles = richText.a;
+			var rt = richText.b;
+			return _List_fromArray(
+				[
+					A2(
+					$elm$html$Html$span,
+					A2(
+						$elm$core$List$map,
+						function (s) {
+							if (s.$ === 'Color') {
+								var c = s.a;
+								return A2($elm$html$Html$Attributes$style, 'color', c);
+							} else {
+								return A2($elm$html$Html$Attributes$style, 'font-weight', 'bold');
+							}
+						},
+						styles),
+					$author$project$RichText$view(rt))
+				]);
+		case 'Line':
+			var rt = richText.a;
+			return _List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					$author$project$RichText$view(rt))
+				]);
+		default:
+			var rts = richText.a;
+			return A2($elm$core$List$concatMap, $author$project$RichText$view, rts);
+	}
+};
+var $author$project$Main$viewInput = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -7677,29 +7690,58 @@ var $author$project$Main$viewPrompt = function (model) {
 					[
 						$elm$html$Html$Attributes$class('shell-line-prompt')
 					]),
-				_List_fromArray(
-					[
-						$author$project$Main$viewText(
-						A2(
-							$author$project$RichText$Styled,
-							$author$project$Main$prompt,
-							_List_fromArray(
-								[
-									$author$project$RichText$Color('#606060')
-								])))
-					])),
+				$author$project$RichText$view($author$project$Main$prompt)),
 				A2(
 				$elm$html$Html$textarea,
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$id('shell-line-input'),
 						$elm$html$Html$Attributes$autofocus(true),
-						$elm$html$Html$Attributes$value(model.prompt),
-						$elm$html$Html$Events$onInput($author$project$Main$UpdatePrompt),
+						$elm$html$Html$Attributes$value(model.input),
+						$elm$html$Html$Events$onInput($author$project$Main$UpdateInput),
 						$author$project$Main$onEnterSubmit
 					]),
 				_List_Nil)
 			]));
+};
+var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $author$project$Main$viewOutput = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('output')
+			]),
+		A2(
+			$elm$core$List$concatMap,
+			function (o) {
+				if (o.$ === 'Text') {
+					var rt = o.a;
+					return $author$project$RichText$view(rt);
+				} else {
+					var u = o.a;
+					return _List_fromArray(
+						[
+							A2(
+							$elm$html$Html$img,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$src(u)
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(u)
+								]))
+						]);
+				}
+			},
+			model.output));
 };
 var $author$project$Main$view = function (model) {
 	return A2(
@@ -7708,7 +7750,7 @@ var $author$project$Main$view = function (model) {
 		_List_fromArray(
 			[
 				$author$project$Main$viewOutput(model),
-				$author$project$Main$viewPrompt(model)
+				$author$project$Main$viewInput(model)
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
