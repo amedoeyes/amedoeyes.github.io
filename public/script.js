@@ -6555,19 +6555,21 @@ var $elm$core$List$head = function (list) {
 	}
 };
 var $author$project$FS$name = function (node) {
-	if (node.$ === 'File') {
-		var name_ = node.a;
-		return name_;
-	} else {
-		var name_ = node.a;
-		return $elm$core$String$isEmpty(name_) ? '/' : name_;
+	switch (node.$) {
+		case 'File':
+			var name_ = node.a;
+			return name_;
+		case 'Reference':
+			var name_ = node.a;
+			return name_;
+		default:
+			var name_ = node.a;
+			return $elm$core$String$isEmpty(name_) ? '/' : name_;
 	}
 };
 var $author$project$FS$child = F2(
 	function (name_, node) {
-		if (node.$ === 'File') {
-			return $elm$core$Maybe$Nothing;
-		} else {
+		if (node.$ === 'Directory') {
 			var children = node.b;
 			return $elm$core$List$head(
 				A2(
@@ -6578,6 +6580,8 @@ var $author$project$FS$child = F2(
 							name_);
 					},
 					children));
+		} else {
+			return $elm$core$Maybe$Nothing;
 		}
 	});
 var $elm$core$List$drop = F2(
@@ -6670,18 +6674,28 @@ var $author$project$Commands$cat = F4(
 											['Error: file', '\'' + (path + '\''), 'does not exist'])))));
 					} else {
 						var node = _v0.a;
-						if (node.$ === 'File') {
-							var content = node.b;
-							return $author$project$IO$Text(content);
-						} else {
-							return $author$project$IO$Text(
-								$author$project$RichText$Line(
-									$author$project$RichText$Plain(
-										A2(
-											$elm$core$String$join,
-											' ',
-											_List_fromArray(
-												['Error:', '\'' + (path + '\''), 'is a directory'])))));
+						switch (node.$) {
+							case 'File':
+								var content = node.b;
+								return $author$project$IO$Text(content);
+							case 'Reference':
+								return $author$project$IO$Text(
+									$author$project$RichText$Line(
+										$author$project$RichText$Plain(
+											A2(
+												$elm$core$String$join,
+												' ',
+												_List_fromArray(
+													['Error:', '\'' + (path + '\''), 'is a reference'])))));
+							default:
+								return $author$project$IO$Text(
+									$author$project$RichText$Line(
+										$author$project$RichText$Plain(
+											A2(
+												$elm$core$String$join,
+												' ',
+												_List_fromArray(
+													['Error:', '\'' + (path + '\''), 'is a directory'])))));
 						}
 					}
 				},
@@ -6737,28 +6751,44 @@ var $author$project$Commands$cd = F3(
 													['Error: the directory', '\'' + (path + '\''), 'does not exist']))))))));
 				} else {
 					var node = _v2.a;
-					if (node.$ === 'File') {
-						return _Utils_Tuple2(
-							model.pwd,
-							A2(
-								$elm$core$List$append,
-								model.output,
-								$elm$core$List$singleton(
-									$author$project$IO$Text(
-										$author$project$RichText$Line(
-											$author$project$RichText$Plain(
-												A2(
-													$elm$core$String$join,
-													' ',
-													_List_fromArray(
-														['Error:', '\'' + (path + '\''), 'is not a directory']))))))));
-					} else {
-						return _Utils_Tuple2(
-							'/' + A2(
-								$elm$core$String$join,
-								'/',
-								$author$project$FS$normalizePath(newPath)),
-							model.output);
+					switch (node.$) {
+						case 'File':
+							return _Utils_Tuple2(
+								model.pwd,
+								A2(
+									$elm$core$List$append,
+									model.output,
+									$elm$core$List$singleton(
+										$author$project$IO$Text(
+											$author$project$RichText$Line(
+												$author$project$RichText$Plain(
+													A2(
+														$elm$core$String$join,
+														' ',
+														_List_fromArray(
+															['Error:', '\'' + (path + '\''), 'is not a directory']))))))));
+						case 'Reference':
+							return _Utils_Tuple2(
+								model.pwd,
+								A2(
+									$elm$core$List$append,
+									model.output,
+									$elm$core$List$singleton(
+										$author$project$IO$Text(
+											$author$project$RichText$Line(
+												$author$project$RichText$Plain(
+													A2(
+														$elm$core$String$join,
+														' ',
+														_List_fromArray(
+															['Error:', '\'' + (path + '\''), 'is not a directory']))))))));
+						default:
+							return _Utils_Tuple2(
+								'/' + A2(
+									$elm$core$String$join,
+									'/',
+									$author$project$FS$normalizePath(newPath)),
+								model.output);
 					}
 				}
 			}
@@ -6810,6 +6840,20 @@ var $author$project$Ports$download = _Platform_outgoingPort(
 					$elm$json$Json$Encode$string($.name))
 				]));
 	});
+var $author$project$Ports$downloadUrl = _Platform_outgoingPort(
+	'downloadUrl',
+	function ($) {
+		return $elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'name',
+					$elm$json$Json$Encode$string($.name)),
+					_Utils_Tuple2(
+					'url',
+					$elm$json$Json$Encode$string($.url))
+				]));
+	});
 var $elm$core$String$concat = function (strings) {
 	return A2($elm$core$String$join, '', strings);
 };
@@ -6836,17 +6880,23 @@ var $author$project$RichText$toString = function (richText) {
 	}
 };
 var $author$project$FS$download = function (node) {
-	if (node.$ === 'File') {
-		var name_ = node.a;
-		var content = node.b;
-		return $author$project$Ports$download(
-			{
-				content: $author$project$RichText$toString(content),
-				mimeType: 'text/plain',
-				name: name_
-			});
-	} else {
-		return $elm$core$Platform$Cmd$none;
+	switch (node.$) {
+		case 'File':
+			var name_ = node.a;
+			var content = node.b;
+			return $author$project$Ports$download(
+				{
+					content: $author$project$RichText$toString(content),
+					mimeType: 'text/plain',
+					name: name_
+				});
+		case 'Reference':
+			var name_ = node.a;
+			var url = node.b;
+			return $author$project$Ports$downloadUrl(
+				{name: name_, url: url});
+		default:
+			return $elm$core$Platform$Cmd$none;
 	}
 };
 var $author$project$Commands$download = F3(
@@ -6884,26 +6934,31 @@ var $author$project$Commands$download = F3(
 													['Error: the file', '\'' + (path + '\''), 'does not exist']))))))));
 				} else {
 					var node = _v2.a;
-					if (node.$ === 'File') {
-						return _Utils_Tuple2(
-							model.output,
-							$author$project$FS$download(node));
-					} else {
-						return function (o) {
-							return _Utils_Tuple2(o, $elm$core$Platform$Cmd$none);
-						}(
-							A2(
-								$elm$core$List$append,
+					switch (node.$) {
+						case 'File':
+							return _Utils_Tuple2(
 								model.output,
-								$elm$core$List$singleton(
-									$author$project$IO$Text(
-										$author$project$RichText$Line(
-											$author$project$RichText$Plain(
-												A2(
-													$elm$core$String$join,
-													' ',
-													_List_fromArray(
-														['Error:', '\'' + (path + '\''), 'is not a file']))))))));
+								$author$project$FS$download(node));
+						case 'Reference':
+							return _Utils_Tuple2(
+								model.output,
+								$author$project$FS$download(node));
+						default:
+							return function (o) {
+								return _Utils_Tuple2(o, $elm$core$Platform$Cmd$none);
+							}(
+								A2(
+									$elm$core$List$append,
+									model.output,
+									$elm$core$List$singleton(
+										$author$project$IO$Text(
+											$author$project$RichText$Line(
+												$author$project$RichText$Plain(
+													A2(
+														$elm$core$String$join,
+														' ',
+														_List_fromArray(
+															['Error:', '\'' + (path + '\''), 'is not a file']))))))));
 					}
 				}
 			}
@@ -6966,6 +7021,10 @@ var $author$project$FS$File = F2(
 	function (a, b) {
 		return {$: 'File', a: a, b: b};
 	});
+var $author$project$FS$Reference = F2(
+	function (a, b) {
+		return {$: 'Reference', a: a, b: b};
+	});
 var $author$project$Main$fileSystem = A2(
 	$author$project$FS$Directory,
 	'',
@@ -6987,6 +7046,7 @@ var $author$project$Main$fileSystem = A2(
 						$author$project$RichText$Line(
 						$author$project$RichText$Plain('world!'))
 					]))),
+			A2($author$project$FS$Reference, 'resume.pdf', './ahmed_aboueleyoun_resume.pdf'),
 			A2(
 			$author$project$FS$File,
 			'file1.txt',
@@ -7183,23 +7243,27 @@ var $author$project$Commands$help = F2(
 	});
 var $elm$core$List$sortBy = _List_sortBy;
 var $author$project$FS$list = function (root) {
-	if (root.$ === 'File') {
-		var name_ = root.a;
-		return $author$project$RichText$Plain(name_);
-	} else {
-		var children = root.b;
-		return $author$project$RichText$Line(
-			$author$project$RichText$Group(
-				A2(
-					$elm$core$List$intersperse,
-					$author$project$RichText$Plain('  '),
+	switch (root.$) {
+		case 'File':
+			var name_ = root.a;
+			return $author$project$RichText$Plain(name_);
+		case 'Reference':
+			var name_ = root.a;
+			return $author$project$RichText$Plain(name_);
+		default:
+			var children = root.b;
+			return $author$project$RichText$Line(
+				$author$project$RichText$Group(
 					A2(
-						$elm$core$List$map,
-						$author$project$RichText$Plain,
+						$elm$core$List$intersperse,
+						$author$project$RichText$Plain('  '),
 						A2(
 							$elm$core$List$map,
-							$author$project$FS$name,
-							A2($elm$core$List$sortBy, $author$project$FS$name, children))))));
+							$author$project$RichText$Plain,
+							A2(
+								$elm$core$List$map,
+								$author$project$FS$name,
+								A2($elm$core$List$sortBy, $author$project$FS$name, children))))));
 	}
 };
 var $author$project$Commands$ls = F3(
@@ -7285,16 +7349,21 @@ var $author$project$Ports$open = _Platform_outgoingPort(
 					$elm$json$Json$Encode$string($.mimeType))
 				]));
 	});
+var $author$project$Ports$openUrl = _Platform_outgoingPort('openUrl', $elm$json$Json$Encode$string);
 var $author$project$FS$open = function (node) {
-	if (node.$ === 'File') {
-		var content = node.b;
-		return $author$project$Ports$open(
-			{
-				content: $author$project$RichText$toString(content),
-				mimeType: 'text/plain'
-			});
-	} else {
-		return $elm$core$Platform$Cmd$none;
+	switch (node.$) {
+		case 'File':
+			var content = node.b;
+			return $author$project$Ports$open(
+				{
+					content: $author$project$RichText$toString(content),
+					mimeType: 'text/plain'
+				});
+		case 'Reference':
+			var url = node.b;
+			return $author$project$Ports$openUrl(url);
+		default:
+			return $elm$core$Platform$Cmd$none;
 	}
 };
 var $author$project$Commands$open = F3(
@@ -7332,26 +7401,31 @@ var $author$project$Commands$open = F3(
 													['Error: the file', '\'' + (path + '\''), 'does not exist']))))))));
 				} else {
 					var node = _v2.a;
-					if (node.$ === 'File') {
-						return _Utils_Tuple2(
-							model.output,
-							$author$project$FS$open(node));
-					} else {
-						return function (o) {
-							return _Utils_Tuple2(o, $elm$core$Platform$Cmd$none);
-						}(
-							A2(
-								$elm$core$List$append,
+					switch (node.$) {
+						case 'File':
+							return _Utils_Tuple2(
 								model.output,
-								$elm$core$List$singleton(
-									$author$project$IO$Text(
-										$author$project$RichText$Line(
-											$author$project$RichText$Plain(
-												A2(
-													$elm$core$String$join,
-													' ',
-													_List_fromArray(
-														['Error:', '\'' + (path + '\''), 'is not a file']))))))));
+								$author$project$FS$open(node));
+						case 'Reference':
+							return _Utils_Tuple2(
+								model.output,
+								$author$project$FS$open(node));
+						default:
+							return function (o) {
+								return _Utils_Tuple2(o, $elm$core$Platform$Cmd$none);
+							}(
+								A2(
+									$elm$core$List$append,
+									model.output,
+									$elm$core$List$singleton(
+										$author$project$IO$Text(
+											$author$project$RichText$Line(
+												$author$project$RichText$Plain(
+													A2(
+														$elm$core$String$join,
+														' ',
+														_List_fromArray(
+															['Error:', '\'' + (path + '\''), 'is not a file']))))))));
 					}
 				}
 			}
@@ -7397,24 +7471,27 @@ var $author$project$FS$tree = function (root) {
 				_List_fromArray(
 					[isLast]));
 			var childLines = function () {
-				if (node.$ === 'File') {
-					return _List_Nil;
-				} else {
-					var children = node.b;
-					var count = $elm$core$List$length(children);
-					return $elm$core$List$concat(
-						A2(
-							$elm$core$List$indexedMap,
-							F2(
-								function (i, c) {
-									return A4(
-										aux,
-										c,
-										depth + 1,
-										childAncestors,
-										_Utils_eq(i, count - 1));
-								}),
-							A2($elm$core$List$sortBy, $author$project$FS$name, children)));
+				switch (node.$) {
+					case 'File':
+						return _List_Nil;
+					case 'Reference':
+						return _List_Nil;
+					default:
+						var children = node.b;
+						var count = $elm$core$List$length(children);
+						return $elm$core$List$concat(
+							A2(
+								$elm$core$List$indexedMap,
+								F2(
+									function (i, c) {
+										return A4(
+											aux,
+											c,
+											depth + 1,
+											childAncestors,
+											_Utils_eq(i, count - 1));
+									}),
+								A2($elm$core$List$sortBy, $author$project$FS$name, children)));
 				}
 			}();
 			var branch = (!depth) ? '' : (isLast ? '└── ' : '├── ');
@@ -7444,16 +7521,25 @@ var $author$project$Commands$tree = F3(
 								['Error: the directory', '\'' + (path + '\''), 'does not exist']))));
 			} else {
 				var node = _v1.a;
-				if (node.$ === 'File') {
-					return $author$project$RichText$Line(
-						$author$project$RichText$Plain(
-							A2(
-								$elm$core$String$join,
-								' ',
-								_List_fromArray(
-									['Error:', '\'' + (path + '\''), 'is not a directory']))));
-				} else {
-					return $author$project$FS$tree(node);
+				switch (node.$) {
+					case 'File':
+						return $author$project$RichText$Line(
+							$author$project$RichText$Plain(
+								A2(
+									$elm$core$String$join,
+									' ',
+									_List_fromArray(
+										['Error:', '\'' + (path + '\''), 'is not a directory']))));
+					case 'Reference':
+						return $author$project$RichText$Line(
+							$author$project$RichText$Plain(
+								A2(
+									$elm$core$String$join,
+									' ',
+									_List_fromArray(
+										['Error:', '\'' + (path + '\''), 'is not a directory']))));
+					default:
+						return $author$project$FS$tree(node);
 				}
 			}
 		};

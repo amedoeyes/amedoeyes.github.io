@@ -72,6 +72,13 @@ cd fileSystem args model =
                                         |> List.append model.output
                                     )
 
+                                FS.Reference _ _ ->
+                                    ( model.pwd
+                                    , IO.Text (RichText.Line (RichText.Plain ([ "Error:", "'" ++ path ++ "'", "is not a directory" ] |> String.join " ")))
+                                        |> List.singleton
+                                        |> List.append model.output
+                                    )
+
                                 FS.Directory _ _ ->
                                     ( "/" ++ (FS.normalizePath newPath |> String.join "/"), model.output )
     in
@@ -126,6 +133,9 @@ tree fileSystem args model =
                         FS.File _ _ ->
                             RichText.Line (RichText.Plain ([ "Error:", "'" ++ path ++ "'", "is not a directory" ] |> String.join " "))
 
+                        FS.Reference _ _ ->
+                            RichText.Line (RichText.Plain ([ "Error:", "'" ++ path ++ "'", "is not a directory" ] |> String.join " "))
+
                         FS.Directory _ _ ->
                             FS.tree node
 
@@ -168,6 +178,9 @@ cat fileSystem gotImage args model =
                                 case node of
                                     FS.File _ content ->
                                         content |> IO.Text
+
+                                    FS.Reference _ _ ->
+                                        IO.Text (RichText.Line (RichText.Plain ([ "Error:", "'" ++ path ++ "'", "is a reference" ] |> String.join " ")))
 
                                     FS.Directory _ _ ->
                                         IO.Text (RichText.Line (RichText.Plain ([ "Error:", "'" ++ path ++ "'", "is a directory" ] |> String.join " ")))
@@ -217,6 +230,9 @@ open fileSystem args model =
                                 FS.File _ _ ->
                                     ( model.output, FS.open node )
 
+                                FS.Reference _ _ ->
+                                    ( model.output, FS.open node )
+
                                 FS.Directory _ _ ->
                                     RichText.Line (RichText.Plain ([ "Error:", "'" ++ path ++ "'", "is not a file" ] |> String.join " "))
                                         |> IO.Text
@@ -251,6 +267,9 @@ download fileSystem args model =
                         Just node ->
                             case node of
                                 FS.File _ _ ->
+                                    ( model.output, FS.download node )
+
+                                FS.Reference _ _ ->
                                     ( model.output, FS.download node )
 
                                 FS.Directory _ _ ->

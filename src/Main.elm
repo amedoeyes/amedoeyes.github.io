@@ -61,6 +61,7 @@ fileSystem =
     FS.Directory ""
         [ FS.File "hello.txt" (RichText.Line (RichText.Plain "Hello world!"))
         , FS.File "hello_lines.txt" (RichText.Group [ RichText.Line (RichText.Plain "Hello"), RichText.Line (RichText.Plain "world!") ])
+        , FS.Reference "resume.pdf" "./ahmed_aboueleyoun_resume.pdf"
         , FS.File "file1.txt" (RichText.Line (RichText.Plain "file 1"))
         , FS.File "file2.txt" (RichText.Line (RichText.Plain "file 2"))
         , FS.Directory "dir"

@@ -1,4 +1,4 @@
-module FS exposing (Node(..), child, download, isDirectory, isFile, list, name, normalizePath, open, resolvePath, tree)
+module FS exposing (Node(..), child, download, isDirectory, isFile, isReference, list, name, normalizePath, open, resolvePath, tree)
 
 import Ports
 import RichText exposing (RichText)
@@ -6,6 +6,7 @@ import RichText exposing (RichText)
 
 type Node
     = File String RichText
+    | Reference String String
     | Directory String (List Node)
 
 
@@ -13,6 +14,9 @@ name : Node -> String
 name node =
     case node of
         File name_ _ ->
+            name_
+
+        Reference name_ _ ->
             name_
 
         Directory name_ _ ->
@@ -29,28 +33,38 @@ isFile node =
         File _ _ ->
             True
 
-        Directory _ _ ->
+        _ ->
             False
 
 
 isDirectory : Node -> Bool
 isDirectory node =
     case node of
-        File _ _ ->
-            False
-
         Directory _ _ ->
             True
+
+        _ ->
+            False
+
+
+isReference : Node -> Bool
+isReference node =
+    case node of
+        Reference _ _ ->
+            True
+
+        _ ->
+            False
 
 
 child : String -> Node -> Maybe Node
 child name_ node =
     case node of
-        File _ _ ->
-            Nothing
-
         Directory _ children ->
             children |> List.filter (\c -> name c == name_) |> List.head
+
+        _ ->
+            Nothing
 
 
 normalizePath : String -> List String
@@ -88,8 +102,17 @@ list root =
         File name_ _ ->
             RichText.Plain name_
 
+        Reference name_ _ ->
+            RichText.Plain name_
+
         Directory _ children ->
-            children |> List.sortBy name |> List.map name |> List.map RichText.Plain |> List.intersperse (RichText.Plain "  ") |> RichText.Group |> RichText.Line
+            children
+                |> List.sortBy name
+                |> List.map name
+                |> List.map RichText.Plain
+                |> List.intersperse (RichText.Plain "  ")
+                |> RichText.Group
+                |> RichText.Line
 
 
 tree : Node -> RichText
@@ -134,6 +157,9 @@ tree root =
                         File _ _ ->
                             []
 
+                        Reference _ _ ->
+                            []
+
                         Directory _ children ->
                             let
                                 count =
@@ -155,6 +181,9 @@ open node =
         File _ content ->
             Ports.open { content = RichText.toString content, mimeType = "text/plain" }
 
+        Reference _ url ->
+            Ports.openUrl url
+
         Directory _ _ ->
             Cmd.none
 
@@ -164,6 +193,9 @@ download node =
     case node of
         File name_ content ->
             Ports.download { name = name_, content = RichText.toString content, mimeType = "text/plain" }
+
+        Reference name_ url ->
+            Ports.downloadUrl { name = name_, url = url }
 
         Directory _ _ ->
             Cmd.none
