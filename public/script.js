@@ -5379,11 +5379,52 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$RichText$Color = function (a) {
+	return {$: 'Color', a: a};
+};
+var $author$project$RichText$Group = function (a) {
+	return {$: 'Group', a: a};
+};
+var $author$project$RichText$Line = function (a) {
+	return {$: 'Line', a: a};
+};
+var $author$project$RichText$Plain = function (a) {
+	return {$: 'Plain', a: a};
+};
+var $author$project$RichText$Styled = F2(
+	function (a, b) {
+		return {$: 'Styled', a: a, b: b};
+	});
+var $author$project$IO$Text = function (a) {
+	return {$: 'Text', a: a};
+};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{history: _List_Nil, input: '', output: _List_Nil, pwd: '/'},
+		{
+			history: _List_Nil,
+			input: '',
+			output: _List_fromArray(
+				[
+					$author$project$IO$Text(
+					$author$project$RichText$Line(
+						$author$project$RichText$Group(
+							_List_fromArray(
+								[
+									$author$project$RichText$Plain('type '),
+									A2(
+									$author$project$RichText$Styled,
+									_List_fromArray(
+										[
+											$author$project$RichText$Color('#808080')
+										]),
+									$author$project$RichText$Plain('help')),
+									$author$project$RichText$Plain(' to see all commands')
+								]))))
+				]),
+			pwd: '/'
+		},
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Main$FocusInput = {$: 'FocusInput'};
@@ -5807,20 +5848,8 @@ var $author$project$Main$subscriptions = function (_v0) {
 					A2($elm$json$Json$Decode$field, 'metaKey', $elm$json$Json$Decode$bool)))
 			]));
 };
-var $author$project$RichText$Group = function (a) {
-	return {$: 'Group', a: a};
-};
 var $author$project$IO$Image = function (a) {
 	return {$: 'Image', a: a};
-};
-var $author$project$RichText$Line = function (a) {
-	return {$: 'Line', a: a};
-};
-var $author$project$RichText$Plain = function (a) {
-	return {$: 'Plain', a: a};
-};
-var $author$project$IO$Text = function (a) {
-	return {$: 'Text', a: a};
 };
 var $elm$core$Basics$always = F2(
 	function (a, _v0) {
@@ -7013,6 +7042,7 @@ var $author$project$Commands$echo = F2(
 				{output: output}),
 			$elm$core$Platform$Cmd$none);
 	});
+var $author$project$RichText$Bold = {$: 'Bold'};
 var $author$project$FS$Directory = F2(
 	function (a, b) {
 		return {$: 'Directory', a: a, b: b};
@@ -7025,71 +7055,93 @@ var $author$project$FS$Reference = F2(
 	function (a, b) {
 		return {$: 'Reference', a: a, b: b};
 	});
-var $author$project$Main$fileSystem = A2(
-	$author$project$FS$Directory,
-	'',
-	_List_fromArray(
+var $author$project$Main$data = {
+	about: $author$project$RichText$Group(
+		_List_fromArray(
+			[
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('Hi, I\'m Ahmed, a software developer interested in programming language theory, functional programming, systems programming, and graphics programming. I like computers, music and cats.')),
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('')),
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('I\'m currently studying programming language theory and making https://github.com/amedoeyes/void-lang a statically typed functional language inspired by Haskell and Rust.')),
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('')),
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('I used to work on my own game engine https://github.com/amedoeyes/void-engine but I dropped it after exploring Rust and Bevy. The reason is that Bevy is everything I want in a game engine, and I realized that contributing to an established game engine is a better use of my time than rewriting my own engine from scratch for the 5th time (yes it was gonna be the 5th lmao).')),
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('')),
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('My setup is NixOS and Helix. You can check my dotfiles at https://github.com/amedoeyes/dotfiles')),
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('')),
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('Regarding music, I mostly listen to Maidcore, Shoegaze, and Progressive Metal. My favorite artists are Yakui The Maid, abriction, and Polyphia. I also practice guitar when I\'m not programming.')),
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('')),
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('Lastly, I value humanity.'))
+			])),
+	contact: $author$project$RichText$Group(
+		_List_fromArray(
+			[
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('Email: amedoeyes@gmail.com')),
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('Discord: @amedoeyes')),
+				$author$project$RichText$Line(
+				$author$project$RichText$Plain('Github: https://github.com/amedoeyes '))
+			])),
+	projects: _List_fromArray(
 		[
-			A2(
-			$author$project$FS$File,
-			'hello.txt',
-			$author$project$RichText$Line(
-				$author$project$RichText$Plain('Hello world!'))),
-			A2(
-			$author$project$FS$File,
-			'hello_lines.txt',
-			$author$project$RichText$Group(
-				_List_fromArray(
-					[
-						$author$project$RichText$Line(
-						$author$project$RichText$Plain('Hello')),
-						$author$project$RichText$Line(
-						$author$project$RichText$Plain('world!'))
-					]))),
-			A2($author$project$FS$Reference, 'resume.pdf', './ahmed_aboueleyoun_resume.pdf'),
-			A2(
-			$author$project$FS$File,
-			'file1.txt',
-			$author$project$RichText$Line(
-				$author$project$RichText$Plain('file 1'))),
-			A2(
-			$author$project$FS$File,
-			'file2.txt',
-			$author$project$RichText$Line(
-				$author$project$RichText$Plain('file 2'))),
-			A2(
-			$author$project$FS$Directory,
-			'dir',
-			_List_fromArray(
-				[
-					A2(
-					$author$project$FS$File,
-					'file1.txt',
-					$author$project$RichText$Line(
-						$author$project$RichText$Plain('file 1'))),
-					A2(
-					$author$project$FS$File,
-					'file2.txt',
-					$author$project$RichText$Line(
-						$author$project$RichText$Plain('file 2'))),
-					A2(
-					$author$project$FS$Directory,
-					'subdir',
-					_List_fromArray(
-						[
-							A2(
-							$author$project$FS$File,
-							'file1.txt',
-							$author$project$RichText$Line(
-								$author$project$RichText$Plain('file 1')))
-						]))
-				]))
-		]));
-var $author$project$RichText$Bold = {$: 'Bold'};
-var $author$project$RichText$Styled = F2(
-	function (a, b) {
-		return {$: 'Styled', a: a, b: b};
-	});
+			{
+			description: $author$project$RichText$Plain('Statically typed, lazily-evaluated functional programming language with Hindley-Milner type inference. Inspired by Haskell and Rust.'),
+			language: $author$project$RichText$Plain('Rust'),
+			name: $author$project$RichText$Plain('void-lang'),
+			repository: $author$project$RichText$Plain('https://github.com/amedoeyes/void-lang')
+		},
+			{
+			description: $author$project$RichText$Plain('Command-line tool to manage external development tools like LSP servers, debuggers, linters, and formatters.'),
+			language: $author$project$RichText$Plain('Go'),
+			name: $author$project$RichText$Plain('mason'),
+			repository: $author$project$RichText$Plain('https://github.com/amedoeyes/mason')
+		},
+			{
+			description: $author$project$RichText$Plain('Command-line tool to interact with MPRIS compatible media players.'),
+			language: $author$project$RichText$Plain('Rust'),
+			name: $author$project$RichText$Plain('mprisctl'),
+			repository: $author$project$RichText$Plain('https://github.com/amedoeyes/mprisctl')
+		},
+			{
+			description: $author$project$RichText$Plain('Cross platform C++23 game engine.'),
+			language: $author$project$RichText$Plain('C++'),
+			name: $author$project$RichText$Plain('void-engine'),
+			repository: $author$project$RichText$Plain('https://github.com/amedoeyes/void-engine')
+		},
+			{
+			description: $author$project$RichText$Plain('Simple modern C++23 command-line interface library.'),
+			language: $author$project$RichText$Plain('C++'),
+			name: $author$project$RichText$Plain('cli'),
+			repository: $author$project$RichText$Plain('https://github.com/amedoeyes/cli')
+		},
+			{
+			description: $author$project$RichText$Plain('Modular modern C++23 lexer library.'),
+			language: $author$project$RichText$Plain('C++'),
+			name: $author$project$RichText$Plain('lexer'),
+			repository: $author$project$RichText$Plain('https://github.com/amedoeyes/lexer')
+		},
+			{
+			description: $author$project$RichText$Plain('This protofolio.'),
+			language: $author$project$RichText$Plain('Elm'),
+			name: $author$project$RichText$Plain('portofolio'),
+			repository: $author$project$RichText$Plain('https://github.com/amedoeyes/amedoeyes.github.io')
+		}
+		])
+};
+var $author$project$RichText$length = function (richText) {
+	return $elm$core$String$length(
+		$author$project$RichText$toString(richText));
+};
 var $elm$core$List$maximum = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -7123,6 +7175,119 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
+var $author$project$Main$fileSystem = A2(
+	$author$project$FS$Directory,
+	'',
+	_List_fromArray(
+		[
+			A2($author$project$FS$File, 'about.txt', $author$project$Main$data.about),
+			A2($author$project$FS$File, 'contact.txt', $author$project$Main$data.contact),
+			A2(
+			$author$project$FS$File,
+			'projects.txt',
+			function () {
+				var maxLen = A2(
+					$elm$core$Maybe$withDefault,
+					0,
+					$elm$core$List$maximum(
+						A2(
+							$elm$core$List$map,
+							function (p) {
+								return $author$project$RichText$length(p.name);
+							},
+							$author$project$Main$data.projects)));
+				return $author$project$RichText$Group(
+					A2(
+						$elm$core$List$map,
+						function (p) {
+							return $author$project$RichText$Line(
+								$author$project$RichText$Group(
+									_List_fromArray(
+										[
+											A2(
+											$author$project$RichText$Styled,
+											_List_fromArray(
+												[$author$project$RichText$Bold]),
+											p.name),
+											$author$project$RichText$Plain(
+											A2(
+												$elm$core$String$repeat,
+												(maxLen - $author$project$RichText$length(p.name)) + 2,
+												' ')),
+											p.description
+										])));
+						},
+						$author$project$Main$data.projects));
+			}()),
+			A2(
+			$author$project$FS$Directory,
+			'projects',
+			A2(
+				$elm$core$List$map,
+				function (p) {
+					return A2(
+						$author$project$FS$File,
+						$author$project$RichText$toString(p.name) + '.txt',
+						$author$project$RichText$Group(
+							_List_fromArray(
+								[
+									$author$project$RichText$Line(
+									$author$project$RichText$Group(
+										_List_fromArray(
+											[
+												A2(
+												$author$project$RichText$Styled,
+												_List_fromArray(
+													[
+														$author$project$RichText$Color('#808080')
+													]),
+												$author$project$RichText$Plain('Name: ')),
+												p.name
+											]))),
+									$author$project$RichText$Line(
+									$author$project$RichText$Group(
+										_List_fromArray(
+											[
+												A2(
+												$author$project$RichText$Styled,
+												_List_fromArray(
+													[
+														$author$project$RichText$Color('#808080')
+													]),
+												$author$project$RichText$Plain('Description: ')),
+												p.description
+											]))),
+									$author$project$RichText$Line(
+									$author$project$RichText$Group(
+										_List_fromArray(
+											[
+												A2(
+												$author$project$RichText$Styled,
+												_List_fromArray(
+													[
+														$author$project$RichText$Color('#808080')
+													]),
+												$author$project$RichText$Plain('Repository: ')),
+												p.repository
+											]))),
+									$author$project$RichText$Line(
+									$author$project$RichText$Group(
+										_List_fromArray(
+											[
+												A2(
+												$author$project$RichText$Styled,
+												_List_fromArray(
+													[
+														$author$project$RichText$Color('#808080')
+													]),
+												$author$project$RichText$Plain('Language: ')),
+												p.language
+											])))
+								])));
+				},
+				$author$project$Main$data.projects)),
+			A2($author$project$FS$Reference, 'resume.pdf', './ahmed_aboueleyoun_resume.pdf')
+		]));
 var $author$project$Commands$help = F2(
 	function (args, model) {
 		var commands = _List_fromArray(
@@ -7131,8 +7296,8 @@ var $author$project$Commands$help = F2(
 				_Utils_Tuple3('clear', '', 'clear the terminal screen'),
 				_Utils_Tuple3('pwd', '', 'output the current working directory'),
 				_Utils_Tuple3('cd', '[DIRECTORY]', 'change directory'),
-				_Utils_Tuple3('ls', '[FILE..]', 'list directory contents'),
-				_Utils_Tuple3('tree', '[FILE..]', 'list contents of directories in a tree-like format'),
+				_Utils_Tuple3('ls', '[FILE]...', 'list directory contents'),
+				_Utils_Tuple3('tree', '[FILE]...', 'list contents of directories in a tree-like format'),
 				_Utils_Tuple3('cat', '[FILE]...', 'concatenate files and output them'),
 				_Utils_Tuple3('open', 'FILE', 'open file'),
 				_Utils_Tuple3('download', 'FILE', 'download file'),
@@ -7611,9 +7776,6 @@ var $author$project$Main$commands = $elm$core$Dict$fromList(
 			_Utils_Tuple2('help', $author$project$Commands$help)
 		]));
 var $elm$browser$Browser$Dom$focus = _Browser_call('focus');
-var $author$project$RichText$Color = function (a) {
-	return {$: 'Color', a: a};
-};
 var $author$project$Main$prompt = A2(
 	$author$project$RichText$Styled,
 	_List_fromArray(

@@ -1,4 +1,4 @@
-module RichText exposing (RichText(..), Style(..), toString, view)
+module RichText exposing (RichText(..), Style(..), length, toString, view)
 
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (style)
@@ -30,6 +30,11 @@ toString richText =
 
         Group rts ->
             rts |> List.map toString |> String.concat
+
+
+length : RichText -> Int
+length richText =
+    richText |> toString |> String.length
 
 
 view : RichText -> List (Html msg)
