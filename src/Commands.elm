@@ -1,4 +1,4 @@
-module Commands exposing (Command, cat, cd, clear, echo, help, ls, pwd, tree)
+module Commands exposing (Command, cat, cd, clear, download, echo, help, ls, open, pwd, tree)
 
 import FS
 import Http
@@ -191,6 +191,78 @@ cat fileSystem gotImage args model =
         ( { model | output = output }, Cmd.none )
 
 
+open : FS.Node -> Command { model | pwd : String, output : List Output } msg
+open fileSystem args model =
+    let
+        ( output, cmd ) =
+            case args of
+                [] ->
+                    RichText.Line (RichText.Plain "Error: expected file")
+                        |> IO.Text
+                        |> List.singleton
+                        |> List.append model.output
+                        |> (\o -> ( o, Cmd.none ))
+
+                path :: _ ->
+                    case FS.resolvePath path fileSystem of
+                        Nothing ->
+                            RichText.Line (RichText.Plain ([ "Error: the file", "'" ++ path ++ "'", "does not exist" ] |> String.join " "))
+                                |> IO.Text
+                                |> List.singleton
+                                |> List.append model.output
+                                |> (\o -> ( o, Cmd.none ))
+
+                        Just node ->
+                            case node of
+                                FS.File _ _ ->
+                                    ( model.output, FS.open node )
+
+                                FS.Directory _ _ ->
+                                    RichText.Line (RichText.Plain ([ "Error:", "'" ++ path ++ "'", "is not a file" ] |> String.join " "))
+                                        |> IO.Text
+                                        |> List.singleton
+                                        |> List.append model.output
+                                        |> (\o -> ( o, Cmd.none ))
+    in
+    ( { model | output = output }, cmd )
+
+
+download : FS.Node -> Command { model | pwd : String, output : List Output } msg
+download fileSystem args model =
+    let
+        ( output, cmd ) =
+            case args of
+                [] ->
+                    RichText.Line (RichText.Plain "Error: expected file")
+                        |> IO.Text
+                        |> List.singleton
+                        |> List.append model.output
+                        |> (\o -> ( o, Cmd.none ))
+
+                path :: _ ->
+                    case FS.resolvePath path fileSystem of
+                        Nothing ->
+                            RichText.Line (RichText.Plain ([ "Error: the file", "'" ++ path ++ "'", "does not exist" ] |> String.join " "))
+                                |> IO.Text
+                                |> List.singleton
+                                |> List.append model.output
+                                |> (\o -> ( o, Cmd.none ))
+
+                        Just node ->
+                            case node of
+                                FS.File _ _ ->
+                                    ( model.output, FS.download node )
+
+                                FS.Directory _ _ ->
+                                    RichText.Line (RichText.Plain ([ "Error:", "'" ++ path ++ "'", "is not a file" ] |> String.join " "))
+                                        |> IO.Text
+                                        |> List.singleton
+                                        |> List.append model.output
+                                        |> (\o -> ( o, Cmd.none ))
+    in
+    ( { model | output = output }, cmd )
+
+
 help : Command { model | output : List Output } msg
 help args model =
     let
@@ -202,21 +274,19 @@ help args model =
             , ( "ls", "[FILE..]", "list directory contents" )
             , ( "tree", "[FILE..]", "list contents of directories in a tree-like format" )
             , ( "cat", "[FILE]...", "concatenate files and output them" )
+            , ( "open", "FILE", "open file" )
+            , ( "download", "FILE", "download file" )
             , ( "help", "[COMMAND]", "display this help message" )
             ]
+
+        maxLen =
+            commands |> List.map (\( name, arguments, _ ) -> String.length name + String.length arguments + 1) |> List.maximum |> Maybe.withDefault 0
     in
     let
         output =
             case args of
                 [] ->
-                    let
-                        values =
-                            commands |> List.sortBy (\( name, _, _ ) -> name)
-
-                        maxLen =
-                            values |> List.map (\( name, arguments, _ ) -> String.length name + String.length arguments + 1) |> List.maximum |> Maybe.withDefault 0
-                    in
-                    values
+                    commands
                         |> List.map
                             (\( name, arguments, description ) ->
                                 IO.Text

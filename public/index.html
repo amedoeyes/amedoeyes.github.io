@@ -8,6 +8,26 @@
 </head>
 <body>
     <main id="main"></main>
-    <script> Elm.Main.init({ node: document.getElementById("main") }); </script>
+    <script>
+      const app = Elm.Main.init({ node: document.getElementById("main") });
+      app.ports.download.subscribe((data) => {
+        const blob = new Blob([data.content], { type: data.mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = data.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+      app.ports.open.subscribe((data) => {
+        const blob = new Blob([data.content], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      });
+      app.ports.openUrl.subscribe((url) => { window.open(url, '_blank'); });
+    </script>
 </body>
 </html>

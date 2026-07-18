@@ -1,5 +1,6 @@
-module FS exposing (Node(..), child, isDirectory, isFile, list, name, normalizePath, resolvePath, tree)
+module FS exposing (Node(..), child, download, isDirectory, isFile, list, name, normalizePath, open, resolvePath, tree)
 
+import Ports
 import RichText exposing (RichText)
 
 
@@ -146,3 +147,23 @@ tree root =
             line :: childLines
     in
     RichText.Group (aux root 0 [] False)
+
+
+open : Node -> Cmd msg
+open node =
+    case node of
+        File _ content ->
+            Ports.open { content = RichText.toString content, mimeType = "text/plain" }
+
+        Directory _ _ ->
+            Cmd.none
+
+
+download : Node -> Cmd msg
+download node =
+    case node of
+        File name_ content ->
+            Ports.download { name = name_, content = RichText.toString content, mimeType = "text/plain" }
+
+        Directory _ _ ->
+            Cmd.none

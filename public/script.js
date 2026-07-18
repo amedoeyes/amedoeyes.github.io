@@ -6779,6 +6779,143 @@ var $author$project$Commands$clear = F2(
 				{output: _List_Nil}),
 			$elm$core$Platform$Cmd$none);
 	});
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Ports$download = _Platform_outgoingPort(
+	'download',
+	function ($) {
+		return $elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'content',
+					$elm$json$Json$Encode$string($.content)),
+					_Utils_Tuple2(
+					'mimeType',
+					$elm$json$Json$Encode$string($.mimeType)),
+					_Utils_Tuple2(
+					'name',
+					$elm$json$Json$Encode$string($.name))
+				]));
+	});
+var $elm$core$String$concat = function (strings) {
+	return A2($elm$core$String$join, '', strings);
+};
+var $author$project$RichText$toString = function (richText) {
+	toString:
+	while (true) {
+		switch (richText.$) {
+			case 'Plain':
+				var str = richText.a;
+				return str;
+			case 'Styled':
+				var rt = richText.b;
+				var $temp$richText = rt;
+				richText = $temp$richText;
+				continue toString;
+			case 'Line':
+				var rt = richText.a;
+				return $author$project$RichText$toString(rt) + '\n';
+			default:
+				var rts = richText.a;
+				return $elm$core$String$concat(
+					A2($elm$core$List$map, $author$project$RichText$toString, rts));
+		}
+	}
+};
+var $author$project$FS$download = function (node) {
+	if (node.$ === 'File') {
+		var name_ = node.a;
+		var content = node.b;
+		return $author$project$Ports$download(
+			{
+				content: $author$project$RichText$toString(content),
+				mimeType: 'text/plain',
+				name: name_
+			});
+	} else {
+		return $elm$core$Platform$Cmd$none;
+	}
+};
+var $author$project$Commands$download = F3(
+	function (fileSystem, args, model) {
+		var _v0 = function () {
+			if (!args.b) {
+				return function (o) {
+					return _Utils_Tuple2(o, $elm$core$Platform$Cmd$none);
+				}(
+					A2(
+						$elm$core$List$append,
+						model.output,
+						$elm$core$List$singleton(
+							$author$project$IO$Text(
+								$author$project$RichText$Line(
+									$author$project$RichText$Plain('Error: expected file'))))));
+			} else {
+				var path = args.a;
+				var _v2 = A2($author$project$FS$resolvePath, path, fileSystem);
+				if (_v2.$ === 'Nothing') {
+					return function (o) {
+						return _Utils_Tuple2(o, $elm$core$Platform$Cmd$none);
+					}(
+						A2(
+							$elm$core$List$append,
+							model.output,
+							$elm$core$List$singleton(
+								$author$project$IO$Text(
+									$author$project$RichText$Line(
+										$author$project$RichText$Plain(
+											A2(
+												$elm$core$String$join,
+												' ',
+												_List_fromArray(
+													['Error: the file', '\'' + (path + '\''), 'does not exist']))))))));
+				} else {
+					var node = _v2.a;
+					if (node.$ === 'File') {
+						return _Utils_Tuple2(
+							model.output,
+							$author$project$FS$download(node));
+					} else {
+						return function (o) {
+							return _Utils_Tuple2(o, $elm$core$Platform$Cmd$none);
+						}(
+							A2(
+								$elm$core$List$append,
+								model.output,
+								$elm$core$List$singleton(
+									$author$project$IO$Text(
+										$author$project$RichText$Line(
+											$author$project$RichText$Plain(
+												A2(
+													$elm$core$String$join,
+													' ',
+													_List_fromArray(
+														['Error:', '\'' + (path + '\''), 'is not a file']))))))));
+					}
+				}
+			}
+		}();
+		var output = _v0.a;
+		var cmd = _v0.b;
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{output: output}),
+			cmd);
+	});
 var $elm$core$List$intersperse = F2(
 	function (sep, xs) {
 		if (!xs.b) {
@@ -6917,7 +7054,6 @@ var $elm$core$String$repeat = F2(
 	function (n, chunk) {
 		return A3($elm$core$String$repeatHelp, n, chunk, '');
 	});
-var $elm$core$List$sortBy = _List_sortBy;
 var $elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
 		if (maybe.$ === 'Just') {
@@ -6938,29 +7074,24 @@ var $author$project$Commands$help = F2(
 				_Utils_Tuple3('ls', '[FILE..]', 'list directory contents'),
 				_Utils_Tuple3('tree', '[FILE..]', 'list contents of directories in a tree-like format'),
 				_Utils_Tuple3('cat', '[FILE]...', 'concatenate files and output them'),
+				_Utils_Tuple3('open', 'FILE', 'open file'),
+				_Utils_Tuple3('download', 'FILE', 'download file'),
 				_Utils_Tuple3('help', '[COMMAND]', 'display this help message')
 			]);
+		var maxLen = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$List$maximum(
+				A2(
+					$elm$core$List$map,
+					function (_v5) {
+						var name = _v5.a;
+						var _arguments = _v5.b;
+						return ($elm$core$String$length(name) + $elm$core$String$length(_arguments)) + 1;
+					},
+					commands)));
 		var output = function () {
 			if (!args.b) {
-				var values = A2(
-					$elm$core$List$sortBy,
-					function (_v3) {
-						var name = _v3.a;
-						return name;
-					},
-					commands);
-				var maxLen = A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$List$maximum(
-						A2(
-							$elm$core$List$map,
-							function (_v2) {
-								var name = _v2.a;
-								var _arguments = _v2.b;
-								return ($elm$core$String$length(name) + $elm$core$String$length(_arguments)) + 1;
-							},
-							values)));
 				return A2(
 					$elm$core$List$append,
 					model.output,
@@ -6992,22 +7123,22 @@ var $author$project$Commands$help = F2(
 													' ') + ('  ' + description))
 											]))));
 						},
-						values));
+						commands));
 			} else {
 				var name = args.a;
-				var _v4 = $elm$core$List$head(
+				var _v2 = $elm$core$List$head(
 					A2(
 						$elm$core$List$filter,
-						function (_v5) {
-							var name_ = _v5.a;
+						function (_v3) {
+							var name_ = _v3.a;
 							return _Utils_eq(name_, name);
 						},
 						commands));
-				if (_v4.$ === 'Just') {
-					var _v6 = _v4.a;
-					var name_ = _v6.a;
-					var _arguments = _v6.b;
-					var description = _v6.c;
+				if (_v2.$ === 'Just') {
+					var _v4 = _v2.a;
+					var name_ = _v4.a;
+					var _arguments = _v4.b;
+					var description = _v4.c;
 					return A2(
 						$elm$core$List$append,
 						model.output,
@@ -7050,6 +7181,7 @@ var $author$project$Commands$help = F2(
 				{output: output}),
 			$elm$core$Platform$Cmd$none);
 	});
+var $elm$core$List$sortBy = _List_sortBy;
 var $author$project$FS$list = function (root) {
 	if (root.$ === 'File') {
 		var name_ = root.a;
@@ -7139,6 +7271,99 @@ var $author$project$Commands$ls = F3(
 				{output: output}),
 			$elm$core$Platform$Cmd$none);
 	});
+var $author$project$Ports$open = _Platform_outgoingPort(
+	'open',
+	function ($) {
+		return $elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'content',
+					$elm$json$Json$Encode$string($.content)),
+					_Utils_Tuple2(
+					'mimeType',
+					$elm$json$Json$Encode$string($.mimeType))
+				]));
+	});
+var $author$project$FS$open = function (node) {
+	if (node.$ === 'File') {
+		var content = node.b;
+		return $author$project$Ports$open(
+			{
+				content: $author$project$RichText$toString(content),
+				mimeType: 'text/plain'
+			});
+	} else {
+		return $elm$core$Platform$Cmd$none;
+	}
+};
+var $author$project$Commands$open = F3(
+	function (fileSystem, args, model) {
+		var _v0 = function () {
+			if (!args.b) {
+				return function (o) {
+					return _Utils_Tuple2(o, $elm$core$Platform$Cmd$none);
+				}(
+					A2(
+						$elm$core$List$append,
+						model.output,
+						$elm$core$List$singleton(
+							$author$project$IO$Text(
+								$author$project$RichText$Line(
+									$author$project$RichText$Plain('Error: expected file'))))));
+			} else {
+				var path = args.a;
+				var _v2 = A2($author$project$FS$resolvePath, path, fileSystem);
+				if (_v2.$ === 'Nothing') {
+					return function (o) {
+						return _Utils_Tuple2(o, $elm$core$Platform$Cmd$none);
+					}(
+						A2(
+							$elm$core$List$append,
+							model.output,
+							$elm$core$List$singleton(
+								$author$project$IO$Text(
+									$author$project$RichText$Line(
+										$author$project$RichText$Plain(
+											A2(
+												$elm$core$String$join,
+												' ',
+												_List_fromArray(
+													['Error: the file', '\'' + (path + '\''), 'does not exist']))))))));
+				} else {
+					var node = _v2.a;
+					if (node.$ === 'File') {
+						return _Utils_Tuple2(
+							model.output,
+							$author$project$FS$open(node));
+					} else {
+						return function (o) {
+							return _Utils_Tuple2(o, $elm$core$Platform$Cmd$none);
+						}(
+							A2(
+								$elm$core$List$append,
+								model.output,
+								$elm$core$List$singleton(
+									$author$project$IO$Text(
+										$author$project$RichText$Line(
+											$author$project$RichText$Plain(
+												A2(
+													$elm$core$String$join,
+													' ',
+													_List_fromArray(
+														['Error:', '\'' + (path + '\''), 'is not a file']))))))));
+					}
+				}
+			}
+		}();
+		var output = _v0.a;
+		var cmd = _v0.b;
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{output: output}),
+			cmd);
+	});
 var $author$project$Commands$pwd = F2(
 	function (_v0, model) {
 		var output = A2(
@@ -7156,9 +7381,6 @@ var $author$project$Commands$pwd = F2(
 	});
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$String$concat = function (strings) {
-	return A2($elm$core$String$join, '', strings);
 };
 var $author$project$FS$tree = function (root) {
 	var aux = F4(
@@ -7294,6 +7516,12 @@ var $author$project$Main$commands = $elm$core$Dict$fromList(
 			_Utils_Tuple2(
 			'cat',
 			A2($author$project$Commands$cat, $author$project$Main$fileSystem, $author$project$Main$GotImage)),
+			_Utils_Tuple2(
+			'open',
+			$author$project$Commands$open($author$project$Main$fileSystem)),
+			_Utils_Tuple2(
+			'download',
+			$author$project$Commands$download($author$project$Main$fileSystem)),
 			_Utils_Tuple2('help', $author$project$Commands$help)
 		]));
 var $elm$browser$Browser$Dom$focus = _Browser_call('focus');
@@ -7463,7 +7691,6 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty('autofocus');
-var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(

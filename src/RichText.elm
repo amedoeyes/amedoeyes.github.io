@@ -1,4 +1,4 @@
-module RichText exposing (RichText(..), Style(..), view)
+module RichText exposing (RichText(..), Style(..), toString, view)
 
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (style)
@@ -14,6 +14,22 @@ type RichText
 type Style
     = Color String
     | Bold
+
+
+toString : RichText -> String
+toString richText =
+    case richText of
+        Plain str ->
+            str
+
+        Styled _ rt ->
+            toString rt
+
+        Line rt ->
+            toString rt ++ "\n"
+
+        Group rts ->
+            rts |> List.map toString |> String.concat
 
 
 view : RichText -> List (Html msg)

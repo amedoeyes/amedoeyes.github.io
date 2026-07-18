@@ -50,6 +50,8 @@ commands =
         , ( "ls", Commands.ls fileSystem )
         , ( "tree", Commands.tree fileSystem )
         , ( "cat", Commands.cat fileSystem GotImage )
+        , ( "open", Commands.open fileSystem )
+        , ( "download", Commands.download fileSystem )
         , ( "help", Commands.help )
         ]
 
